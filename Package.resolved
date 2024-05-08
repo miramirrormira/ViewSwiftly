@@ -1,0 +1,15 @@
+{
+  "originHash" : "9e03420c4b7baa9be43e912c216fcdf6a9676a436ceb8e4727eae6c8f7e92d1a",
+  "pins" : [
+    {
+      "identity" : "netswiftly",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/miramirrormira/NetSwiftly.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "11e3aec6079caa627f2ca6df13110776811a9788"
+      }
+    }
+  ],
+  "version" : 3
+}
