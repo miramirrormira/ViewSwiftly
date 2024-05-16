@@ -19,7 +19,7 @@ public struct PaginatedList<T: Identifiable, ItemView: View, LoadingView: View, 
     let edgeInsets: EdgeInsets
     let enableRefresh: Bool
     
-    init(viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>,
+    public init(viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>,
          itemView: @escaping (T) -> ItemView,
          @ViewBuilder loadingView: () -> LoadingView,
          @ViewBuilder emptyListView: () -> EmptyListView,

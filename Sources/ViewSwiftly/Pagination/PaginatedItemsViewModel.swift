@@ -15,7 +15,7 @@ public class PaginatedItemsViewModel<T: Identifiable>: ViewModel {
     private var firstItemOfLastPage: T.ID?
     private let mergeItemsStrategy: MergeItemsStrategy
     
-    init(requestable: AnyRequestable<[T]>,
+    public init(requestable: AnyRequestable<[T]>,
          mergeItemsStrategy: MergeItemsStrategy) {
         self.requestable = requestable
         self.mergeItemsStrategy = mergeItemsStrategy

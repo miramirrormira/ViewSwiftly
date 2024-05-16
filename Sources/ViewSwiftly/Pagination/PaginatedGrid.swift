@@ -21,7 +21,7 @@ public struct PaginatedGrid<T: Identifiable, ItemView: View, LoadingView: View, 
     let axis: Axis.Set
     let layout: [GridItem]
     
-    init(viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>,
+    public init(viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>,
          itemView: @escaping (T) -> ItemView,
          @ViewBuilder loadingView: () -> LoadingView,
          @ViewBuilder emptyListView: () -> EmptyListView,
