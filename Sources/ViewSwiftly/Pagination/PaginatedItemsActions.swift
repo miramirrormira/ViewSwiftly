@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum PaginatedItemsActions<T> {
+public enum PaginatedItemsActions<T> {
     case requestNextPage
     case attemptLoadNextPage(item: T)
     case refresh

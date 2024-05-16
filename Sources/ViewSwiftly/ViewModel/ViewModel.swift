@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-protocol ViewModel: ObservableObject {
+public protocol ViewModel: ObservableObject {
     associatedtype State
     associatedtype Action
     

@@ -10,7 +10,7 @@ import NetSwiftly
 
 public class PaginatedItemsViewModel<T: Identifiable>: ViewModel {
     
-    @MainActor @Published var state = PaginatedItemsState<T>()
+    @MainActor @Published public var state = PaginatedItemsState<T>()
     private var requestable: AnyRequestable<[T]>
     private var firstItemOfLastPage: T.ID?
     private let mergeItemsStrategy: MergeItemsStrategy
@@ -22,7 +22,7 @@ public class PaginatedItemsViewModel<T: Identifiable>: ViewModel {
     }
     
     @MainActor
-    func trigger(_ action: PaginatedItemsActions<T>) async {
+    public func trigger(_ action: PaginatedItemsActions<T>) async {
         switch action {
         case .requestNextPage:
             do {
