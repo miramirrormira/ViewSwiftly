@@ -7,9 +7,12 @@
 
 import Foundation
 
-@MainActor
-class AppendItems: MergeItemsStrategy {
-    func merge<T>(vm: PaginatedItemsViewModel<T>, with newItems: [T]) async where T : Identifiable {
+
+public class AppendItems: MergeItemsStrategy {
+    public init() { }
+    
+    @MainActor
+    public func merge<T>(vm: PaginatedItemsViewModel<T>, with newItems: [T]) async where T : Identifiable {
         vm.state.items.append(contentsOf: newItems)
     }
 }
