@@ -45,6 +45,6 @@ public class PaginatedItemsViewModel<T: Identifiable>: ViewModel {
     }
     
     private func shouldRequestNextPage(by item: T) -> Bool {
-        item.id == firstItemOfLastPage
+        firstItemOfLastPage == nil || item.id == firstItemOfLastPage!
     }
 }
