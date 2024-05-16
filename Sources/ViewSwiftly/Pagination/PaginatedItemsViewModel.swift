@@ -8,12 +8,12 @@
 import Foundation
 import NetSwiftly
 
-class PaginatedItemsViewModel<T: Identifiable>: ViewModel {
+public class PaginatedItemsViewModel<T: Identifiable>: ViewModel {
     
     @MainActor @Published var state = PaginatedItemsState<T>()
-    var requestable: AnyRequestable<[T]>
-    var firstItemOfLastPage: T.ID?
-    var mergeItemsStrategy: MergeItemsStrategy
+    private var requestable: AnyRequestable<[T]>
+    private var firstItemOfLastPage: T.ID?
+    private let mergeItemsStrategy: MergeItemsStrategy
     
     init(requestable: AnyRequestable<[T]>,
          mergeItemsStrategy: MergeItemsStrategy) {

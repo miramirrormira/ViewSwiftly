@@ -35,6 +35,4 @@ extension PaginatedItemsState.Status: Equatable {
             return false
         }
     }
-    
-    
 }
