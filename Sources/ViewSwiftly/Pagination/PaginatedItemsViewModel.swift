@@ -11,13 +11,13 @@ import NetSwiftly
 public class PaginatedItemsViewModel<T: Identifiable>: ViewModel {
     
     @MainActor @Published public var state = PaginatedItemsState<T>()
-    private var requestable: AnyRequestable<[T]>
+    private var repository: AnyRequestable<[T]>
     private var firstItemOfLastPage: T.ID?
     private let mergeItemsStrategy: MergeItemsStrategy
     
     public init(requestable: AnyRequestable<[T]>,
          mergeItemsStrategy: MergeItemsStrategy = AppendItems()) {
-        self.requestable = requestable
+        self.repository = requestable
         self.mergeItemsStrategy = mergeItemsStrategy
     }
     
@@ -28,7 +28,7 @@ public class PaginatedItemsViewModel<T: Identifiable>: ViewModel {
             do {
                 guard state.status != .loading else { return }
                 state.status = .loading
-                let newItems = try await requestable.request()
+                let newItems = try await repository.request()
                 state.status = .success
                 firstItemOfLastPage = newItems.first?.id
                 await mergeItemsStrategy.merge(vm: self, with: newItems)
