@@ -12,7 +12,7 @@ public class AppendItems: MergeItemsStrategy {
     public init() { }
     
     @MainActor
-    public func merge<T>(vm: PaginatedItemsViewModel<T>, with newItems: [T]) async where T : Identifiable {
+    public func merge<ItemType, PageType>(vm: PaginatedItemsViewModel<ItemType, PageType>, with newItems: [ItemType]) async where ItemType : Identifiable {
         vm.state.items.append(contentsOf: newItems)
     }
 }

@@ -7,5 +7,5 @@
 
 import Foundation
 public protocol MergeItemsStrategy {
-    func merge<T>(vm: PaginatedItemsViewModel<T>, with newItems: [T]) async
+    func merge<ItemType, PageType>(vm: PaginatedItemsViewModel<ItemType, PageType>, with newItems: [ItemType]) async
 }
