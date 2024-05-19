@@ -1,5 +1,5 @@
 {
-  "originHash" : "c40d10eb85bf5e4e0936db2a68a969fe4469f6a15e556d51fef164f036cb0a50",
+  "originHash" : "907e133480a6fa9bebf11e05b106d96f37c5fe508ea01f88981b53d87795c699",
   "pins" : [
     {
       "identity" : "netswiftly",
@@ -7,7 +7,7 @@
       "location" : "https://github.com/miramirrormira/NetSwiftly.git",
       "state" : {
         "branch" : "main",
-        "revision" : "301b91968da5a17e275b7ac6bfb5d6f62313ad7e"
+        "revision" : "ac61984905f68d5d40e975d283ace3c22015ff4d"
       }
     }
   ],

@@ -36,6 +36,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable, PageType>: ViewMode
                 state.status = .success
                 firstItemOfLastPage = newItems.first?.id
                 await mergeItemsStrategy.merge(vm: self, with: newItems)
+                state.firstPageLoaded = true
             } catch {
                 state.status = .error(error)
             }
