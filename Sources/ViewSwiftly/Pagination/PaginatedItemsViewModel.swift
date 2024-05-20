@@ -32,8 +32,8 @@ public class PaginatedItemsViewModel<ItemType: Identifiable, PageType>: ViewMode
                 guard state.status != .loading else { return }
                 state.status = .loading
                 let pageContent = try await requestable.request()
-                let newItems = try await transform(pageContent)
                 state.status = .success
+                let newItems = try await transform(pageContent)
                 firstItemOfLastPage = newItems.first?.id
                 await mergeItemsStrategy.merge(vm: self, with: newItems)
                 state.firstPageLoaded = true
