@@ -11,10 +11,10 @@ import NetSwiftly
 public class PaginatedItemsViewModel<ItemType: Identifiable, PageType>: ViewModel {
     
     @MainActor @Published public var state = PaginatedItemsState<ItemType>()
-    private var requestable: AnyRequestable<PageType>
-    private var firstItemOfLastPage: ItemType.ID?
-    private let mergeItemsStrategy: MergeItemsStrategy
-    private let transform: (PageType) async throws -> [ItemType]
+    var requestable: AnyRequestable<PageType>
+    var firstItemOfLastPage: ItemType.ID?
+    let mergeItemsStrategy: MergeItemsStrategy
+    let transform: (PageType) async throws -> [ItemType]
     
     public init(requestable: AnyRequestable<PageType>,
                 mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
@@ -28,15 +28,15 @@ public class PaginatedItemsViewModel<ItemType: Identifiable, PageType>: ViewMode
     public func trigger(_ action: PaginatedItemsActions<ItemType>) async {
         switch action {
         case .requestNextPage:
+            guard state.status != .loading else { return }
+            state.status = .loading
             do {
-                guard state.status != .loading else { return }
-                state.status = .loading
                 let pageContent = try await requestable.request()
-                state.status = .success
-                let newItems = try await transform(pageContent)
-                firstItemOfLastPage = newItems.first?.id
-                await mergeItemsStrategy.merge(vm: self, with: newItems)
                 state.firstPageLoaded = true
+                state.status = .success
+                let items = try await transform(pageContent)
+                firstItemOfLastPage = items.first?.id
+                await mergeItemsStrategy.merge(vm: self, with: items)
             } catch {
                 state.status = .error(error)
             }
@@ -49,7 +49,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable, PageType>: ViewMode
         }
     }
     
-    private func shouldRequestNextPage(by item: ItemType) -> Bool {
+    func shouldRequestNextPage(by item: ItemType) -> Bool {
         firstItemOfLastPage == nil || item.id == firstItemOfLastPage!
     }
 }

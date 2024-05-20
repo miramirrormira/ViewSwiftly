@@ -7,8 +7,8 @@
 
 import Foundation
 
-public enum PaginatedItemsActions<T> {
+public enum PaginatedItemsActions<ItemType> {
     case requestNextPage
-    case attemptLoadNextPage(item: T)
+    case attemptLoadNextPage(item: ItemType)
     case refresh
 }
