@@ -31,7 +31,7 @@ extension PaginatedItemsView {
         ForEach(viewModel.state.items) { item in
             itemView(item)
                 .onAppear {
-                    Task {
+                    Task(priority: .background) {
                         await viewModel.trigger(.attemptLoadNextPage(item: item))
                     }
                 }

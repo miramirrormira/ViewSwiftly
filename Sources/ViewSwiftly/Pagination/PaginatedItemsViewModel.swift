@@ -15,13 +15,16 @@ public class PaginatedItemsViewModel<ItemType: Identifiable, PageType>: ViewMode
     var firstItemOfLastPage: ItemType.ID?
     let mergeItemsStrategy: MergeItemsStrategy
     let transform: (PageType) async throws -> [ItemType]
+    let onFetchItems: (([ItemType]) async throws -> Void)?
     
     public init(requestable: AnyRequestable<PageType>,
                 mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
-                transform: @escaping (PageType) async throws -> [ItemType]) {
+                transform: @escaping (PageType) async throws -> [ItemType],
+                onFetchItems: (([ItemType]) async throws -> Void)? = nil) {
         self.requestable = requestable
         self.mergeItemsStrategy = mergeItemsStrategy
         self.transform = transform
+        self.onFetchItems = onFetchItems
     }
     
     @MainActor
@@ -37,6 +40,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable, PageType>: ViewMode
                 let items = try await transform(pageContent)
                 firstItemOfLastPage = items.first?.id
                 await mergeItemsStrategy.merge(vm: self, with: items)
+                try await onFetchItems?(items)
             } catch {
                 state.status = .error(error)
             }

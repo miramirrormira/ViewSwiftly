@@ -50,6 +50,16 @@ final class PaginatedItemsViewModelTests: XCTestCase {
     }
     
     @MainActor
+    func test_requestNextPage_with_success_new_items_status_should_be_success() async throws {
+        let newItems = [Item(id: "0")]
+        let requestable = RequestableStub(returning: Page(items: newItems))
+        let sut = PaginatedItemsViewModel<Item, Page>(requestable: AnyRequestable(requestable)) { $0.items }
+        XCTAssertNotEqual(sut.state.status, .success)
+        await sut.trigger(.requestNextPage)
+        XCTAssertEqual(sut.state.status, .success)
+    }
+    
+    @MainActor
     func test_requestNextPage_with_failure_error_should_get_error() async throws {
         
         let requestable = RequestableStub<Page>(error: NetworkingClientSideError.cannotGenerateURL)
@@ -57,5 +67,19 @@ final class PaginatedItemsViewModelTests: XCTestCase {
         XCTAssertEqual(sut.state.status, .notRequested)
         await sut.trigger(.requestNextPage)
         XCTAssertEqual(sut.state.status, PaginatedItemsState.Status.error(NetworkingClientSideError.cannotGenerateURL))
+    }
+    
+    @MainActor
+    func test_requestNextPage_with_success_new_items_should_trigger_onFetchItems() async throws {
+        let newItems = [Item(id: "0")]
+        let requestable = RequestableStub(returning: Page(items: newItems))
+        
+        var calledOnFetchItems = false
+        let onFetchItems: ([Item]) async throws -> Void = { _ in
+            calledOnFetchItems = true
+        }
+        let sut = PaginatedItemsViewModel(requestable: AnyRequestable(requestable), transform: { $0.items }, onFetchItems: onFetchItems)
+        await sut.trigger(.requestNextPage)
+        XCTAssertTrue(calledOnFetchItems)
     }
 }
