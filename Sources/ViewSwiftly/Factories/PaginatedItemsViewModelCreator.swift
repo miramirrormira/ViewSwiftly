@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  PaginatedItemsViewModelCreator.swift
 //  
 //
 //  Created by Mira Yang on 5/21/24.
