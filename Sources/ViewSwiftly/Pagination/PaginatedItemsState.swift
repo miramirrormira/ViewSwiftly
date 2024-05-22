@@ -8,7 +8,7 @@
 import Foundation
 
 public struct PaginatedItemsState<T: Identifiable> {
-    var items: [T] = []
+    public var items: [T] = []
     var firstPageLoaded: Bool = false
     var status: Status = .notRequested
     
