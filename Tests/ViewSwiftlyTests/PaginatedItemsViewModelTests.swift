@@ -82,4 +82,44 @@ final class PaginatedItemsViewModelTests: XCTestCase {
         await sut.trigger(.requestNextPage)
         XCTAssertTrue(calledOnFetchItems)
     }
+    
+    func test_convenient_init_for_url_requestables_mergeItemsStrategy_should_be_identical() async throws {
+        let networkConfiguration = NetworkConfiguration.fixture()
+        let endpoint = Endpoint.fixture()
+        let paginationQueryStrategy = PageBasedQueryStrategy.fixture()
+        let mergeItemsStrategy = AppendItems()
+        
+        let sut = PaginatedItemsViewModel<Item, Page>(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, transform: { $0.items }, mergeItemsStrategy: mergeItemsStrategy)
+        
+        XCTAssertIdentical(sut.mergeItemsStrategy as? AppendItems, mergeItemsStrategy)
+    }
+    
+    func test_convenient_init_for_url_requestables_onFetchItems_should_be_triggered() async throws {
+        let networkConfiguration = NetworkConfiguration.fixture()
+        let endpoint = Endpoint.fixture()
+        let paginationQueryStrategy = PageBasedQueryStrategy.fixture()
+        var calledOnFetchItems = false
+        let onFetchItems: ([Item]) async throws -> Void = { _ in calledOnFetchItems = true }
+        
+        let sut = PaginatedItemsViewModel<Item, Page>(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, transform: { $0.items }, onFetchItems: onFetchItems)
+        XCTAssertFalse(calledOnFetchItems)
+        XCTAssertNotNil(sut.onFetchItems)
+        try await sut.onFetchItems?([])
+        XCTAssertTrue(calledOnFetchItems)
+    }
+    
+    func test_convenient_init_for_url_requestables_transform_should_be_triggered() async throws {
+        let networkConfiguration = NetworkConfiguration.fixture()
+        let endpoint = Endpoint.fixture()
+        let paginationQueryStrategy = PageBasedQueryStrategy.fixture()
+        var calledTransform = false
+        let transform: (Page) async throws -> [Item] = { page in
+            calledTransform = true
+            return page.items
+        }
+        let sut = PaginatedItemsViewModel<Item, Page>(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, transform: transform)
+        XCTAssertFalse(calledTransform)
+        let _ = try await sut.transform(Page(items: []))
+        XCTAssertTrue(calledTransform)
+    }
 }

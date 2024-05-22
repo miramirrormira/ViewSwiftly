@@ -7,10 +7,10 @@
 
 import Foundation
 
-struct Page {
+struct Page: Decodable {
     var items: [Item]
 }
 
-struct Item: Identifiable {
+struct Item: Identifiable, Decodable {
     var id: String
 }

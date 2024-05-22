@@ -8,7 +8,7 @@
 import Foundation
 import NetSwiftly
 
-public class PaginatedItemsViewModel<ItemType: Identifiable, PageType>: ViewModel {
+public class PaginatedItemsViewModel<ItemType: Identifiable, PageType: Decodable>: ViewModel {
     
     @MainActor @Published public var state = PaginatedItemsState<ItemType>()
     var requestable: AnyRequestable<PageType>
@@ -55,5 +55,17 @@ public class PaginatedItemsViewModel<ItemType: Identifiable, PageType>: ViewMode
     
     func shouldRequestNextPage(by item: ItemType) -> Bool {
         firstItemOfLastPage == nil || item.id == firstItemOfLastPage!
+    }
+}
+
+public extension PaginatedItemsViewModel {
+    convenience init(networkConfiguration: NetworkConfiguration,
+                     endpoint: Endpoint,
+                     paginationQueryStrategy: PaginationQueryStrategy,
+                     transform: @escaping (PageType) async throws -> [ItemType],
+                     mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
+                     onFetchItems: (([ItemType]) async throws -> Void)? = nil) {
+        let requestable = PaginatedURLRequestCommand<PageType>.init(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy)
+        self.init(requestable: AnyRequestable(requestable), mergeItemsStrategy: mergeItemsStrategy, transform: transform, onFetchItems: onFetchItems)
     }
 }
