@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  RefreshableModifier.swift
 //  
 //
 //  Created by Mira Yang on 5/15/24.
@@ -9,30 +9,20 @@ import Foundation
 import SwiftUI
 
 struct RefreshableModifier: ViewModifier {
-    
-    @Environment(\.refresh) private var refresh
-    @State private var isRefreshing = false
+    @StateObject private var vm: RefreshableModifierViewModel = .init()
     
     func body(content: Content) -> some View {
         VStack {
-            if isRefreshing {
+            if vm.isRefreshing {
                 ProgressView()
             }
             content
         }
-        .animation(.default, value: isRefreshing)
-        .background(GeometryReader {
-            Color.clear.preference(key: PreferenceKey.self, value: -$0.frame(in: .global).origin.y)
+        .animation(.default, value: vm.isRefreshing)
+        .background(GeometryReader { geometry in
+            Color.clear.preference(key: PreferenceKey.self, value: -geometry.frame(in: .global).origin.y)
         })
-        .onPreferenceChange(PreferenceKey.self) {
-            if $0 < -80 && isRefreshing == false {
-                isRefreshing = true
-                Task {
-                    await refresh?()
-                    isRefreshing = false
-                }
-            }
-        }
+        .onPreferenceChange(PreferenceKey.self, perform: vm.onOffsetChange(_:))
     }
     
     struct PreferenceKey: SwiftUI.PreferenceKey {

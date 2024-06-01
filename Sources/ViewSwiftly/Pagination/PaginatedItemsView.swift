@@ -14,14 +14,14 @@ protocol PaginatedItemsView: View {
     associatedtype PageView: View
     associatedtype LoadingView: View
     associatedtype EmptyListView: View
-    associatedtype T: Identifiable
+    associatedtype ItemType: Identifiable
     
-    var itemView: (T) -> ItemView { get set }
+    var itemView: (ItemType) -> ItemView { get set }
     var loadingView: LoadingView { get set }
     var emptyListView: EmptyListView { get set }
     func listView() -> PageView
     
-    var viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>> { get set }
+    var viewModel: AnyViewModel<PaginatedItemsState<ItemType>, PaginatedItemsActions<ItemType>> { get }
     var enableRefresh: Bool { get }
 }
 

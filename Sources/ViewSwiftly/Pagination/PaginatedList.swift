@@ -8,19 +8,19 @@
 import Foundation
 import SwiftUI
 
-public struct PaginatedList<T: Identifiable, ItemView: View, LoadingView: View, EmptyListView: View>: PaginatedItemsView {
+public struct PaginatedList<ItemType: Identifiable, ItemView: View, LoadingView: View, EmptyListView: View>: PaginatedItemsView {
 
-    @ObservedObject var viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>
+    @ObservedObject var viewModel: AnyViewModel<PaginatedItemsState<ItemType>, PaginatedItemsActions<ItemType>>
     
-    @ViewBuilder var itemView: (T) -> ItemView
+    @ViewBuilder var itemView: (ItemType) -> ItemView
     var loadingView: LoadingView
     var emptyListView: EmptyListView
     
     let edgeInsets: EdgeInsets
     let enableRefresh: Bool
     
-    public init(viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>,
-         itemView: @escaping (T) -> ItemView,
+    public init(viewModel: AnyViewModel<PaginatedItemsState<ItemType>, PaginatedItemsActions<ItemType>>,
+         itemView: @escaping (ItemType) -> ItemView,
          @ViewBuilder loadingView: () -> LoadingView,
          @ViewBuilder emptyListView: () -> EmptyListView,
          edgeInsets: EdgeInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0),

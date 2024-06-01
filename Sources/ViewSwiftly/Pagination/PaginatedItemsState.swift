@@ -7,8 +7,8 @@
 
 import Foundation
 
-public struct PaginatedItemsState<T: Identifiable> {
-    public var items: [T] = []
+public struct PaginatedItemsState<ItemType: Identifiable> {
+    public var items: [ItemType] = []
     var firstPageLoaded: Bool = false
     var status: Status = .notRequested
     
@@ -21,7 +21,7 @@ public struct PaginatedItemsState<T: Identifiable> {
 }
 
 extension PaginatedItemsState.Status: Equatable {
-    static func == (lhs: PaginatedItemsState<T>.Status, rhs: PaginatedItemsState<T>.Status) -> Bool {
+    static func == (lhs: PaginatedItemsState<ItemType>.Status, rhs: PaginatedItemsState<ItemType>.Status) -> Bool {
         switch (lhs, rhs) {
         case (.loading, .loading):
             return true

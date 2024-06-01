@@ -11,4 +11,5 @@ public enum PaginatedItemsActions<ItemType> {
     case requestNextPage
     case attemptLoadNextPage(item: ItemType)
     case refresh
+    case filter(predicate: (ItemType) -> Bool)
 }

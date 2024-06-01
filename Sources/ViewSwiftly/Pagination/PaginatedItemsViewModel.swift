@@ -7,6 +7,7 @@
 
 import Foundation
 import NetSwiftly
+import Combine
 
 public class PaginatedItemsViewModel<ItemType: Identifiable, PageType: Decodable>: ViewModel {
     
@@ -50,6 +51,8 @@ public class PaginatedItemsViewModel<ItemType: Identifiable, PageType: Decodable
             if shouldRequestNextPage(by: item) {
                 await trigger(.requestNextPage)
             }
+        case .filter(predicate: let predicate):
+            state.items = state.items.filter(predicate)
         }
     }
     
