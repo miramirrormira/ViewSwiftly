@@ -32,7 +32,7 @@ extension PaginatedItemsView {
             itemView(item)
                 .onAppear {
                     Task(priority: .background) {
-                        await viewModel.trigger(.attemptLoadNextPage(item: item))
+                        await viewModel.trigger(.onAppear(item: item))
                     }
                 }
         }

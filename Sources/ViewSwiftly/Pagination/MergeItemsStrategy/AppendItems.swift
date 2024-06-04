@@ -9,6 +9,7 @@ import Foundation
 
 
 public class AppendItems: MergeItemsStrategy {
+    
     public init() { }
     
     @MainActor
