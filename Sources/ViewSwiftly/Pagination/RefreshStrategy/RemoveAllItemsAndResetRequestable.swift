@@ -21,8 +21,8 @@ class RemoveAllItemsAndResetRequestable: RefreshStrategy {
     }
     
     @MainActor
-    func refresh<ItemType, PageType>(vm: PaginatedItemsViewModel<ItemType, PageType>) where ItemType : Identifiable, PageType : Decodable {
-        let requestable = PaginatedURLRequestCommand<PageType>.init(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy)
+    func refresh<ItemType>(vm: PaginatedItemsViewModel<ItemType>) {
+        let requestable = PaginatedURLRequestCommand<[ItemType]>.init(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy)
         vm.requestable = AnyRequestable(requestable)
         vm.state.items = []
     }

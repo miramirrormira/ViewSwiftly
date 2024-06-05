@@ -7,7 +7,7 @@ final class AppendItemsTests: XCTestCase {
     @MainActor
     func test_merge_with_empty_newItems_array() async {
         let sut = AppendItems()
-        let vmStub = PaginatedItemsViewModel<Item, Page>.init(requestable: AnyRequestable<Page>(RequestableDummy()), mergeItemsStrategy: sut, transform: { $0.items })
+        let vmStub = PaginatedItemsViewModel<Item>.init(requestable: AnyRequestable<[Item]>(RequestableDummy()), mergeItemsStrategy: sut)
         XCTAssertEqual(vmStub.state.items.count, 0)
         await sut.merge(vm: vmStub, with: [Item]())
         XCTAssertEqual(vmStub.state.items.count, 0)
@@ -21,7 +21,7 @@ final class AppendItemsTests: XCTestCase {
             returningObjects.append(Item(id: "\(i)"))
         }
         let sut = AppendItems()
-        let vmStub = PaginatedItemsViewModel<Item, Page>(requestable: AnyRequestable<Page>(RequestableDummy()), mergeItemsStrategy: sut, transform: { $0.items })
+        let vmStub = PaginatedItemsViewModel<Item>(requestable: AnyRequestable<[Item]>(RequestableDummy()), mergeItemsStrategy: sut)
         XCTAssertEqual(vmStub.state.items.count, 0)
         await sut.merge(vm: vmStub, with: returningObjects)
         XCTAssertEqual(vmStub.state.items.count, itemsCount)
