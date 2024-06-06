@@ -12,7 +12,7 @@ public class AnyRefreshStrategy<T: Decodable & Identifiable>: RefreshStrategy {
     public typealias ItemType = T
     let wrappedRefresh: (PaginatedItemsViewModel<T>) -> Void
     
-    init<V: RefreshStrategy>(_ strategy: V) where V.ItemType == T {
+    public init<V: RefreshStrategy>(_ strategy: V) where V.ItemType == T {
         wrappedRefresh = strategy.refresh(vm:)
     }
     
