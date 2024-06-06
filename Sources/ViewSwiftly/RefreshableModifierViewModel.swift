@@ -8,17 +8,29 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 class RefreshableModifierViewModel: ObservableObject {
-    @Published var isRefreshing: Bool = false
-    @Environment(\.refresh) var refresh
+    @Published var refreshing: Bool = false
+    var refreshingTask: Task<Void, Never>?
     
-    func onOffsetChange(_ offset: CGFloat) {
-        if offset < -80 && isRefreshing == false {
-            isRefreshing = true
-            Task {
-                await refresh?()
-                isRefreshing = false
-            }
-        }
+    func setRefreshing(with offset: CGFloat) {
+        self.refreshing = offset < -80
+    }
+    
+    func setRefreshing(_ refreshing: Bool) {
+        self.refreshing = refreshing
+    }
+    
+    func setRefreshingTask(_ task: Task<Void, Never>?) {
+        self.refreshingTask = task
+    }
+    
+    func shouldRefresh() -> Bool {
+        refreshingTask == nil && refreshing == false
+    }
+    
+    func reset() {
+        refreshingTask = nil
+        refreshing = false
     }
 }
