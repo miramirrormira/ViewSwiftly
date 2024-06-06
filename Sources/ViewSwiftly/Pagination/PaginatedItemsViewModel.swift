@@ -15,10 +15,10 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable>: ViewMo
     public var requestable: AnyRequestable<[ItemType]>
     public var firstItemOfLastPage: ItemType.ID?
     public var lastItemOfLastPage: ItemType.ID?
-    public let mergeItemsStrategy: MergeItemsStrategy
-    public let refreshStrategy: AnyRefreshStrategy<ItemType>?
-    public let onFetchItems: (([ItemType]) async throws -> Void)?
-    public let scrollDirection: ScrollDirection
+    public var mergeItemsStrategy: MergeItemsStrategy
+    public var refreshStrategy: AnyRefreshStrategy<ItemType>?
+    public var onFetchItems: (([ItemType]) async throws -> Void)?
+    public var scrollDirection: ScrollDirection
     
     public enum ScrollDirection {
         case up, down
