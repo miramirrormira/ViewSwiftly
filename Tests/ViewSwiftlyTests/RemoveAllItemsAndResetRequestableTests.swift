@@ -9,9 +9,11 @@ final class RemoveAllItemsAndResetRequestableTests: XCTestCase {
         let networkConfiguration = NetworkConfiguration.fixture()
         let endpoint = Endpoint.fixture()
         let paginationQueryStrategy = PageBasedQueryStrategy.fixture()
-        let sut = RemoveAllItemsAndResetRequestable(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy)
+        let sut = RemoveAllItemsAndResetRequestable<Page, Item>(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, transform: { $0.items })
         
-        let vm = PaginatedItemsViewModel<Item>(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy)
+        let transform: (Page) -> [Item] = { $0.items }
+        let vm = PaginatedItemsViewModel<Item>.init(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, transform: transform)
+        
         vm.state.items = [Item.init(id: "1")]
         let originalRequestable = vm.requestable
         XCTAssertNotEqual(vm.state.items.count, 0)

@@ -8,5 +8,6 @@
 import Foundation
 
 public protocol RefreshStrategy {
-    func refresh<ItemType>(vm: PaginatedItemsViewModel<ItemType>)
+    associatedtype ItemType: Decodable & Identifiable
+    func refresh(vm: PaginatedItemsViewModel<ItemType>)
 }

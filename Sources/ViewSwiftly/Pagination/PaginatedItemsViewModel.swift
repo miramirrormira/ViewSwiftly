@@ -16,7 +16,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable>: ViewMo
     public var firstItemOfLastPage: ItemType.ID?
     public var lastItemOfLastPage: ItemType.ID?
     public let mergeItemsStrategy: MergeItemsStrategy
-    public let refreshStrategy: RefreshStrategy?
+    public let refreshStrategy: AnyRefreshStrategy<ItemType>?
     public let onFetchItems: (([ItemType]) async throws -> Void)?
     public let scrollDirection: ScrollDirection
     
@@ -26,7 +26,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable>: ViewMo
     
     public init(requestable: AnyRequestable<[ItemType]>,
                 mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
-                refreshStrategy: RefreshStrategy? = nil,
+                refreshStrategy: AnyRefreshStrategy<ItemType>? = nil,
                 onFetchItems: (([ItemType]) async throws -> Void)? = nil,
                 scrollDirection: ScrollDirection = .down) {
         self.requestable = requestable
@@ -75,13 +75,20 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable>: ViewMo
 }
 
 public extension PaginatedItemsViewModel {
-    convenience init(networkConfiguration: NetworkConfiguration,
-                     endpoint: Endpoint,
-                     paginationQueryStrategy: PaginationQueryStrategy,
-                     mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
-                     refreshStrategy: RefreshStrategy? = nil,
-                     onFetchItems: (([ItemType]) async throws -> Void)? = nil) {
-        let requestable = PaginatedURLRequestCommand<[ItemType]>.init(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy)
-        self.init(requestable: AnyRequestable(requestable), mergeItemsStrategy: mergeItemsStrategy, refreshStrategy: refreshStrategy, onFetchItems: onFetchItems)
+    convenience init<PageType: Decodable>(networkConfiguration: NetworkConfiguration,
+                                          endpoint: Endpoint,
+                                          paginationQueryStrategy: PaginationQueryStrategy,
+                                          mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
+                                          refreshStrategy: AnyRefreshStrategy<ItemType>? = nil,
+                                          onFetchItems: (([ItemType]) async throws -> Void)? = nil,
+                                          transform: @escaping (PageType) -> [ItemType]) {
+        
+        let requestable = PaginatedURLRequestCommand<PageType, ItemType>(networkConfiguration: networkConfiguration,
+                                                                         endpoint: endpoint,
+                                                                         paginationQueryStrategy: paginationQueryStrategy,
+                                                                         transform: transform)
+        
+        let anyRequestable = AnyRequestable<[ItemType]>(requestable)
+        self.init(requestable: anyRequestable, mergeItemsStrategy: mergeItemsStrategy, refreshStrategy: refreshStrategy, onFetchItems: onFetchItems)
     }
 }

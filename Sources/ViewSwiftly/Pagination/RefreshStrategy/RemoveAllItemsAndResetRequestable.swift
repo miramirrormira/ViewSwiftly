@@ -8,21 +8,26 @@
 import Foundation
 import NetSwiftly
 
-class RemoveAllItemsAndResetRequestable: RefreshStrategy {
+class RemoveAllItemsAndResetRequestable<PageType: Decodable, ItemType: Decodable & Identifiable>: RefreshStrategy {
+   
     let networkConfiguration: NetworkConfiguration
     let endpoint: Endpoint
     let paginationQueryStrategy: PaginationQueryStrategy
+    let transform: (PageType) -> [ItemType]
+    
     init(networkConfiguration: NetworkConfiguration,
          endpoint: Endpoint,
-         paginationQueryStrategy: PaginationQueryStrategy) {
+         paginationQueryStrategy: PaginationQueryStrategy,
+         transform: @escaping (PageType) -> [ItemType]) {
         self.networkConfiguration = networkConfiguration
         self.endpoint = endpoint
         self.paginationQueryStrategy = paginationQueryStrategy
+        self.transform = transform
     }
     
     @MainActor
-    func refresh<ItemType>(vm: PaginatedItemsViewModel<ItemType>) {
-        let requestable = PaginatedURLRequestCommand<[ItemType]>.init(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy)
+    func refresh(vm: PaginatedItemsViewModel<ItemType>) {
+        let requestable = PaginatedURLRequestCommand(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, transform: transform)
         vm.requestable = AnyRequestable(requestable)
         vm.state.items = []
     }

@@ -109,8 +109,8 @@ final class PaginatedItemsViewModelTests: XCTestCase {
         let endpoint = Endpoint.fixture()
         let paginationQueryStrategy = PageBasedQueryStrategy.fixture()
         let mergeItemsStrategy = AppendItems()
-        
-        let sut = PaginatedItemsViewModel<Item>(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, mergeItemsStrategy: mergeItemsStrategy)
+        let transform: (Page) -> [Item] = { $0.items }
+        let sut = PaginatedItemsViewModel<Item>(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, mergeItemsStrategy: mergeItemsStrategy, transform: transform)
         
         XCTAssertIdentical(sut.mergeItemsStrategy as? AppendItems, mergeItemsStrategy)
     }
@@ -121,8 +121,8 @@ final class PaginatedItemsViewModelTests: XCTestCase {
         let paginationQueryStrategy = PageBasedQueryStrategy.fixture()
         var calledOnFetchItems = false
         let onFetchItems: ([Item]) async throws -> Void = { _ in calledOnFetchItems = true }
-        
-        let sut = PaginatedItemsViewModel<Item>(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, onFetchItems: onFetchItems)
+        let transform: (Page) -> [Item] = { $0.items }
+        let sut = PaginatedItemsViewModel<Item>(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, onFetchItems: onFetchItems, transform: transform)
         XCTAssertFalse(calledOnFetchItems)
         XCTAssertNotNil(sut.onFetchItems)
         try await sut.onFetchItems?([])
