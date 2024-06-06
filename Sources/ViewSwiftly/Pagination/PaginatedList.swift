@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 public struct PaginatedList<ItemType: Identifiable, ItemView: View, LoadingView: View, EmptyListView: View>: PaginatedItemsView {
-
+    
     @ObservedObject var viewModel: AnyViewModel<PaginatedItemsState<ItemType>, PaginatedItemsActions<ItemType>>
     
     @ViewBuilder var itemView: (ItemType) -> ItemView
@@ -20,11 +20,11 @@ public struct PaginatedList<ItemType: Identifiable, ItemView: View, LoadingView:
     let enableRefresh: Bool
     
     public init(viewModel: AnyViewModel<PaginatedItemsState<ItemType>, PaginatedItemsActions<ItemType>>,
-         itemView: @escaping (ItemType) -> ItemView,
-         @ViewBuilder loadingView: () -> LoadingView,
-         @ViewBuilder emptyListView: () -> EmptyListView,
-         edgeInsets: EdgeInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0),
-         enableRefresh: Bool = true) {
+                itemView: @escaping (ItemType) -> ItemView,
+                @ViewBuilder loadingView: () -> LoadingView = { EmptyView() },
+                @ViewBuilder emptyListView: () -> EmptyListView = { EmptyView() },
+                edgeInsets: EdgeInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0),
+                enableRefresh: Bool = true) {
         self.viewModel = viewModel
         self.itemView = itemView
         self.loadingView = loadingView()

@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 public struct PaginatedGrid<T: Identifiable, ItemView: View, LoadingView: View, EmptyListView: View>: PaginatedItemsView {
-
+    
     @ObservedObject var viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>
     
     @ViewBuilder var itemView: (T) -> ItemView
@@ -22,13 +22,13 @@ public struct PaginatedGrid<T: Identifiable, ItemView: View, LoadingView: View, 
     let layout: [GridItem]
     
     public init(viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>,
-         itemView: @escaping (T) -> ItemView,
-         @ViewBuilder loadingView: () -> LoadingView,
-         @ViewBuilder emptyListView: () -> EmptyListView,
-         layout: [GridItem],
-         edgeInsets: EdgeInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0),
-         enableRefresh: Bool = true,
-         axis: Axis.Set = .vertical) {
+                itemView: @escaping (T) -> ItemView,
+                @ViewBuilder loadingView: () -> LoadingView = { EmptyView() },
+                @ViewBuilder emptyListView: () -> EmptyListView = { EmptyView() },
+                layout: [GridItem],
+                edgeInsets: EdgeInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0),
+                enableRefresh: Bool = true,
+                axis: Axis.Set = .vertical) {
         self.viewModel = viewModel
         self.itemView = itemView
         self.loadingView = loadingView()
