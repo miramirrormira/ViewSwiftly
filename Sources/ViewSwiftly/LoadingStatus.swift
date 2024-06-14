@@ -6,7 +6,7 @@
 //
 
 import Foundation
-enum LoadingStatus {
+public enum LoadingStatus {
     case notRequested
     case loading
     case success
@@ -14,7 +14,7 @@ enum LoadingStatus {
 }
 
 extension LoadingStatus: Equatable {
-    static func == (lhs: LoadingStatus, rhs: LoadingStatus) -> Bool {
+    public static func == (lhs: LoadingStatus, rhs: LoadingStatus) -> Bool {
         switch (lhs, rhs) {
         case (.loading, .loading):
             return true
