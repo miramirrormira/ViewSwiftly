@@ -1,13 +1,22 @@
 {
-  "originHash" : "907e133480a6fa9bebf11e05b106d96f37c5fe508ea01f88981b53d87795c699",
+  "originHash" : "47bcfda0f43b9e258dfb748468974ee9817dc9fbac75fb1e181bf8e8cc7f6ce5",
   "pins" : [
+    {
+      "identity" : "cacheswiftly",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/miramirrormira/CacheSwiftly",
+      "state" : {
+        "branch" : "main",
+        "revision" : "6f81b71ecc081d6cb1a4002d291e774fbb8a882c"
+      }
+    },
     {
       "identity" : "netswiftly",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/miramirrormira/NetSwiftly.git",
       "state" : {
         "branch" : "main",
-        "revision" : "9f3a704d16f671a07ae26c71fc25cbf980519dab"
+        "revision" : "683ae5af367b6299d9db7a7418ad84036872a328"
       }
     }
   ],

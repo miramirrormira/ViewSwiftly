@@ -87,7 +87,7 @@ final class PaginatedItemsViewModelTests: XCTestCase {
         let sut = PaginatedItemsViewModel<Item>(requestable: AnyRequestable(requestable))
         XCTAssertEqual(sut.state.status, .notRequested)
         await sut.trigger(.requestNextPage)
-        XCTAssertEqual(sut.state.status, PaginatedItemsState.Status.error(NetworkingClientSideError.cannotGenerateURL))
+        XCTAssertEqual(sut.state.status, LoadingStatus.error(NetworkingClientSideError.cannotGenerateURL))
     }
     
     @MainActor
