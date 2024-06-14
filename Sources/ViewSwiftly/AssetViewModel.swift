@@ -42,7 +42,6 @@ public class AssetViewModel<AssetType>: ViewModel {
     }
 }
 
-
 public struct AssetState<AssetType> {
     public var asset: AssetType?
     public var status: LoadingStatus = .notRequested
