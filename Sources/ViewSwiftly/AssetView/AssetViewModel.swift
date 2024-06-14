@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import NetSwiftly
 
 public class AssetViewModel<AssetType>: ViewModel {
     
@@ -17,6 +18,10 @@ public class AssetViewModel<AssetType>: ViewModel {
     
     public init(responsePublisher: AnyResponsePublisher<AssetType>) {
         self.responsePublisher = responsePublisher
+    }
+    
+    public init(requestable: AnyRequestable<AssetType>) {
+        self.responsePublisher = AnyResponsePublisher(RequestResponseSubject(requestable: requestable))
     }
     
     public func trigger(_ action: AssetActions) async {

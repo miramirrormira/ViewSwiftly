@@ -14,11 +14,11 @@ public class AnyResponsePublisher<V>: ResponsePublisher {
     
     let wrappedPublisher: () async throws -> AnyPublisher<Response, Error>
     
-    init<R: ResponsePublisher>(_ responsePublisher: R) where R.Response == V {
+    public init<R: ResponsePublisher>(_ responsePublisher: R) where R.Response == V {
         self.wrappedPublisher = responsePublisher.publisher
     }
     
-    public func publisher() async throws -> AnyPublisher<V, any Error> {
+    public func publisher() async throws -> AnyPublisher<V, Error> {
         try await wrappedPublisher()
     }
 }

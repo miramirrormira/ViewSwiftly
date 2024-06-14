@@ -9,13 +9,13 @@ final class PersistFallbackRequestSubjectTests: XCTestCase {
         let persistRequest = AnyRequestable(RequestableStub<Int>(delayInSeconds: 0.0, returning: 0))
         let networkingRequest = AnyRequestable(RequestableStub<Int>(delayInSeconds: 1.0, returning: 2))
         
-        let sut = PersistFallbackRequestSubject(networkingRequest: networkingRequest, persistedRequest: persistRequest)
+        let sut = FallbackPublisherDecorator(fallbackRequestable: persistRequest, responseRequestable: networkingRequest)
         
         let expection = expectation(description: "expection")
         var counter = 0
         var finalValue: Int? = nil
         var cancellables = Set<AnyCancellable>()
-        sut.publisher()
+        try await sut.publisher()
             .sink { completion in
                 switch completion {
                 case .finished:
@@ -39,13 +39,13 @@ final class PersistFallbackRequestSubjectTests: XCTestCase {
         let persistRequest = AnyRequestable(RequestableStub<Int>(delayInSeconds: 1.0, returning: 0))
         let networkingRequest = AnyRequestable(RequestableStub<Int>(delayInSeconds: 0.0, returning: 2))
         
-        let sut = PersistFallbackRequestSubject(networkingRequest: networkingRequest, persistedRequest: persistRequest)
+        let sut = FallbackPublisherDecorator(fallbackRequestable: persistRequest, responseRequestable: networkingRequest)
         
         let expection = expectation(description: "expection")
         var counter = 0
         var finalValue: Int? = nil
         var cancellables = Set<AnyCancellable>()
-        sut.publisher()
+        try await sut.publisher()
             .sink { completion in
                 switch completion {
                 case .finished:
