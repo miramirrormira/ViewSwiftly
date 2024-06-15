@@ -9,22 +9,22 @@ import Foundation
 import Combine
 import NetSwiftly
 
-public class AssetViewModel<AssetType>: ViewModel {
+public class FetchResponseViewModel<ResponseType>: ViewModel {
     
-    public var state: AssetState<AssetType> = .init()
+    public var state: FetchResponseState<ResponseType> = .init()
     
-    public let responsePublisher: AnyResponsePublisher<AssetType>
+    public let responsePublisher: AnyResponsePublisher<ResponseType>
     var cancellables: Set<AnyCancellable> = []
     
-    public init(responsePublisher: AnyResponsePublisher<AssetType>) {
+    public init(responsePublisher: AnyResponsePublisher<ResponseType>) {
         self.responsePublisher = responsePublisher
     }
     
-    public init(requestable: AnyRequestable<AssetType>) {
+    public init(requestable: AnyRequestable<ResponseType>) {
         self.responsePublisher = AnyResponsePublisher(RequestResponseSubject(requestable: requestable))
     }
     
-    public func trigger(_ action: AssetActions) async {
+    public func trigger(_ action: FetchResponseActions) async {
         switch action  {
         case .request:
             state.status = .loading
@@ -37,7 +37,7 @@ public class AssetViewModel<AssetType>: ViewModel {
                         self.state.status = .error(error)
                     }
                 } receiveValue: { value in
-                    self.state.asset = value
+                    self.state.response = value
                 }
                 .store(in: &cancellables)
             } catch {
@@ -47,11 +47,11 @@ public class AssetViewModel<AssetType>: ViewModel {
     }
 }
 
-public struct AssetState<AssetType> {
-    public var asset: AssetType?
+public struct FetchResponseState<ResponseType> {
+    public var response: ResponseType?
     public var status: LoadingStatus = .notRequested
 }
 
-public enum AssetActions {
+public enum FetchResponseActions {
     case request
 }
