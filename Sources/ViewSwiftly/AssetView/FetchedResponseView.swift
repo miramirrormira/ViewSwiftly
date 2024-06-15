@@ -39,18 +39,18 @@ extension FetchedResponseView {
                 memoryCache: AnyCachable<Task<ResponseType, Error>>,
                 key: String,
                 content: @escaping (ResponseType) -> ResponseView) {
-        let cachedRequestable = CachedRequestableDecorator(cache: memoryCache, key: key, requestable: requestable)
+        let cachedRequestable = CachedTaskRequestableDecorator(cache: memoryCache, key: key, requestable: requestable)
         let vm = AnyViewModel(FetchResponseViewModel<ResponseType>(requestable: AnyRequestable(cachedRequestable)))
         self.init(with: vm, content: content)
     }
     
     public init(from requestable: AnyRequestable<ResponseType>,
                 memoryCache: AnyCachable<Task<ResponseType, Error>>,
-                diskCache: AnyCachable<Task<ResponseType, Error>>,
+                diskCache: AnyCachable<ResponseType>,
                 key: String,
                 content: @escaping (ResponseType) -> ResponseView) {
         let diskCachedRequestable = CachedRequestableDecorator(cache: diskCache, key: key, requestable: requestable)
-        let layerCachedRequestable = CachedRequestableDecorator(cache: memoryCache, key: key, requestable: AnyRequestable(diskCachedRequestable))
+        let layerCachedRequestable = CachedTaskRequestableDecorator(cache: memoryCache, key: key, requestable: AnyRequestable(diskCachedRequestable))
         let vm = AnyViewModel(FetchResponseViewModel<ResponseType>(requestable: AnyRequestable(layerCachedRequestable)))
         self.init(with: vm, content: content)
     }
