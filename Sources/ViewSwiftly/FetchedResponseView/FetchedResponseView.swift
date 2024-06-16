@@ -22,6 +22,7 @@ public struct FetchedResponseView<ResponseType, ResponseView: View>: View {
             } else if let response = vm.state.response {
                 content(response)
             }
+            Text("HELLO!")
         }
         .onAppear {
             Task {
