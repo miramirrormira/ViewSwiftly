@@ -33,7 +33,10 @@ public class FetchResponseViewModel<ResponseType>: ViewModel {
         case .request:
             state.status = .loading
             do {
-                try await responsePublisher.publisher().sink { completion in
+                try await responsePublisher
+                    .publisher()
+                    .receive(on: RunLoop.main)
+                    .sink { completion in
                     switch completion {
                     case .finished:
                         self.state.status = .success
