@@ -12,7 +12,7 @@ import NetSwiftly
 
 public struct FetchedResponseView<ResponseType, ResponseView: View>: View {
     
-    @ObservedObject private var vm: AnyViewModel<FetchResponseState<ResponseType>, FetchResponseActions>
+    @StateObject private var vm: AnyViewModel<FetchResponseState<ResponseType>, FetchResponseActions>
     @ViewBuilder var content: (ResponseType) -> ResponseView
     
     public var body: some View {
@@ -33,7 +33,7 @@ extension FetchedResponseView {
     
     public init(with vm: AnyViewModel<FetchResponseState<ResponseType>, FetchResponseActions>,
                 @ViewBuilder content: @escaping (ResponseType) -> ResponseView) {
-        self.vm = vm
+        self._vm = StateObject(wrappedValue: vm)
         self.content = content
     }
     
