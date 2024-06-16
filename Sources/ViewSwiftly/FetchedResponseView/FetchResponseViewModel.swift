@@ -11,7 +11,7 @@ import NetSwiftly
 
 public class FetchResponseViewModel<ResponseType>: ViewModel {
     
-    public var state: FetchResponseState<ResponseType> = .init()
+    @Published public var state: FetchResponseState<ResponseType> = .init()
     
     public let responsePublisher: AnyResponsePublisher<ResponseType>
     var cancellables: Set<AnyCancellable> = []
