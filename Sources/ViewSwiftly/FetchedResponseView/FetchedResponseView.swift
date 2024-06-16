@@ -17,17 +17,14 @@ public struct FetchedResponseView<ResponseType, ResponseView: View>: View {
     
     public var body: some View {
         Group {
-            if vm.state.status == .loading {
-                ProgressView()
-            } else if let response = vm.state.response {
+            if let response = vm.state.response {
                 content(response)
+            } else {
+                ProgressView()
             }
-            Text("HELLO!")
         }
-        .onAppear {
-            Task {
-                await vm.trigger(.request)
-            }
+        .task {
+            await vm.trigger(.request)
         }
     }
 }
