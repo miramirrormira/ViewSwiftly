@@ -38,9 +38,9 @@ extension FetchedResponseView {
     }
     
     public init(from requestable: AnyRequestable<ResponseType>,
-                memoryCache: AnyCachable<Task<ResponseType, Error>>?,
-                diskCache: AnyCachable<ResponseType>?,
-                key: String,
+                memoryCache: AnyCachable<Task<ResponseType, Error>>? = nil,
+                diskCache: AnyCachable<ResponseType>? = nil,
+                key: String = "",
                 label: String = "",
                 @ViewBuilder content: @escaping (ResponseType) -> ResponseView) {
         var finalRequestable = requestable
