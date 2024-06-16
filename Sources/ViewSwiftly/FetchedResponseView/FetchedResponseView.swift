@@ -19,12 +19,16 @@ public struct FetchedResponseView<ResponseType, ResponseView: View>: View {
         Group {
             if vm.state.status == .loading {
                 ProgressView()
+            } else if vm.state.status == .notRequested {
+                EmptyView()
             } else if let response = vm.state.response {
                 content(response)
             }
         }
-        .task {
-            await vm.trigger(.request)
+        .onAppear {
+            Task {
+                await vm.trigger(.request)
+            }
         }
     }
 }
