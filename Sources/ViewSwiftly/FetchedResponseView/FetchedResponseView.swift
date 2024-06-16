@@ -1,5 +1,5 @@
 //
-//  ImageAssetView.swift
+//  FetchedResponseView.swift
 //
 //
 //  Created by Mira Yang on 6/14/24.
@@ -38,22 +38,19 @@ extension FetchedResponseView {
     }
     
     public init(from requestable: AnyRequestable<ResponseType>,
-                memoryCache: AnyCachable<Task<ResponseType, Error>>,
+                memoryCache: AnyCachable<Task<ResponseType, Error>>?,
+                diskCache: AnyCachable<ResponseType>?,
                 key: String,
+                label: String = "",
                 @ViewBuilder content: @escaping (ResponseType) -> ResponseView) {
-        let cachedRequestable = CachedTaskRequestableDecorator(cache: memoryCache, key: key, requestable: requestable)
-        let vm = AnyViewModel(FetchResponseViewModel<ResponseType>(requestable: AnyRequestable(cachedRequestable)))
-        self.init(with: vm, content: content)
-    }
-    
-    public init(from requestable: AnyRequestable<ResponseType>,
-                memoryCache: AnyCachable<Task<ResponseType, Error>>,
-                diskCache: AnyCachable<ResponseType>,
-                key: String,
-                @ViewBuilder content: @escaping (ResponseType) -> ResponseView) {
-        let diskCachedRequestable = CachedRequestableDecorator(cache: diskCache, key: key, requestable: requestable)
-        let layerCachedRequestable = CachedTaskRequestableDecorator(cache: memoryCache, key: key, requestable: AnyRequestable(diskCachedRequestable))
-        let vm = AnyViewModel(FetchResponseViewModel<ResponseType>(requestable: AnyRequestable(layerCachedRequestable)))
+        var finalRequestable = requestable
+        if let diskCache = diskCache {
+            finalRequestable = AnyRequestable(CachedRequestableDecorator(cache: diskCache, key: key, requestable: requestable))
+        }
+        if let memoryCache = memoryCache {
+            finalRequestable = AnyRequestable(CachedTaskRequestableDecorator(cache: memoryCache, key: key, requestable: finalRequestable))
+        }
+        let vm = AnyViewModel(FetchResponseViewModel<ResponseType>(requestable: finalRequestable, label: label))
         self.init(with: vm, content: content)
     }
 }

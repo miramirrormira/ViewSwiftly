@@ -12,16 +12,19 @@ import NetSwiftly
 public class FetchResponseViewModel<ResponseType>: ViewModel {
     
     @MainActor @Published public var state: FetchResponseState<ResponseType> = .init()
+    let label: String
     
     public let responsePublisher: AnyResponsePublisher<ResponseType>
     var cancellables: Set<AnyCancellable> = []
     
-    public init(responsePublisher: AnyResponsePublisher<ResponseType>) {
+    public init(responsePublisher: AnyResponsePublisher<ResponseType>, label: String = "") {
         self.responsePublisher = responsePublisher
+        self.label = label
     }
     
-    public init(requestable: AnyRequestable<ResponseType>) {
+    public init(requestable: AnyRequestable<ResponseType>, label: String = "") {
         self.responsePublisher = AnyResponsePublisher(RequestResponseSubject(requestable: requestable))
+        self.label = label
     }
     
     @MainActor
@@ -45,6 +48,10 @@ public class FetchResponseViewModel<ResponseType>: ViewModel {
                 self.state.status = .error(error)
             }
         }
+    }
+    
+    deinit {
+        Logger.debug("deinit \(Self.Type.self) label: \(label)")
     }
 }
 
