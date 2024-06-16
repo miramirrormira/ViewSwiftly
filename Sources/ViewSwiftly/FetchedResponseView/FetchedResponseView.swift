@@ -16,10 +16,15 @@ public struct FetchedResponseView<ResponseType, ResponseView: View>: View {
     @ViewBuilder var content: (ResponseType) -> ResponseView
     
     public var body: some View {
-        if vm.state.status == .loading {
-            ProgressView()
-        } else if let response = vm.state.response {
-            content(response)
+        Group {
+            if vm.state.status == .loading {
+                ProgressView()
+            } else if let response = vm.state.response {
+                content(response)
+            }
+        }
+        .task {
+            await vm.trigger(.request)
         }
     }
 }
@@ -30,9 +35,6 @@ extension FetchedResponseView {
                 @ViewBuilder content: @escaping (ResponseType) -> ResponseView) {
         self.vm = vm
         self.content = content
-        Task {
-            await vm.trigger(.request)
-        }
     }
     
     public init(from requestable: AnyRequestable<ResponseType>,

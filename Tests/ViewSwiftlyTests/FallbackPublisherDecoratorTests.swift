@@ -3,7 +3,7 @@
 import XCTest
 import Combine
 
-final class PersistFallbackRequestSubjectTests: XCTestCase {
+final class FallbackPublisherDecoratorTests: XCTestCase {
     
     func test_publisher_persistedRequestPublish0thenNetworkingRequestPublish2_shouldReceiveBothPublishedValues() async throws {
         let persistRequest = AnyRequestable(RequestableStub<Int>(delayInSeconds: 0.0, returning: 0))
