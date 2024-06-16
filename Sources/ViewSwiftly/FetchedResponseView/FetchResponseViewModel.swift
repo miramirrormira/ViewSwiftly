@@ -42,6 +42,7 @@ public class FetchResponseViewModel<ResponseType>: ViewModel {
                         self.state.status = .success
                     case .failure(let error):
                         self.state.status = .error(error)
+                        Logger.error("failed fetching response: \(error.localizedDescription)")
                     }
                 } receiveValue: { value in
                     self.state.response = value
@@ -54,7 +55,7 @@ public class FetchResponseViewModel<ResponseType>: ViewModel {
     }
     
     deinit {
-        Logger.debug("deinit \(Self.Type.self) label: \(label)")
+        Logger.info("deinit \(Self.Type.self) label: \(label)")
     }
 }
 
