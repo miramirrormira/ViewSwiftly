@@ -41,7 +41,7 @@ public class FetchResponseViewModel<ResponseType>: ViewModel {
                     case .finished:
                         self.state.status = .success
                     case .failure(let error):
-                        self.state.status = .error(error)
+                        self.state.status = .failure(error)
                         Logger.error("failed fetching response: \(error.localizedDescription)")
                     }
                 } receiveValue: { value in
@@ -49,7 +49,7 @@ public class FetchResponseViewModel<ResponseType>: ViewModel {
                 }
                 .store(in: &cancellables)
             } catch {
-                self.state.status = .error(error)
+                self.state.status = .failure(error)
             }
         }
     }

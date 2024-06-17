@@ -10,17 +10,20 @@ import SwiftUI
 import CacheSwiftly
 import NetSwiftly
 
-public struct FetchedResponseView<ResponseType, ResponseView: View>: View {
+public struct FetchedResponseView<ResponseType, ResponseView: View, ErrorView: View>: View {
     
     @StateObject private var vm: AnyViewModel<FetchResponseState<ResponseType>, FetchResponseActions>
     @ViewBuilder var content: (ResponseType) -> ResponseView
+    @ViewBuilder var errorView: (Error) -> ErrorView
     
     public var body: some View {
         Group {
             if let response = vm.state.response {
                 content(response)
-            } else {
+            } else if vm.state.status == .loading {
                 ProgressView()
+            } else if let error = vm.state.status.error {
+                errorView(error)
             }
         }
         .task {
@@ -32,9 +35,11 @@ public struct FetchedResponseView<ResponseType, ResponseView: View>: View {
 extension FetchedResponseView {
     
     public init(with vm: AnyViewModel<FetchResponseState<ResponseType>, FetchResponseActions>,
-                @ViewBuilder content: @escaping (ResponseType) -> ResponseView) {
+                @ViewBuilder content: @escaping (ResponseType) -> ResponseView,
+                @ViewBuilder errorView: @escaping (Error) -> ErrorView = { _ in EmptyView() }) {
         self._vm = StateObject(wrappedValue: vm)
         self.content = content
+        self.errorView = errorView
     }
     
     public init(from requestable: AnyRequestable<ResponseType>,
@@ -42,7 +47,8 @@ extension FetchedResponseView {
                 diskCache: AnyCachable<ResponseType>? = nil,
                 key: String = "",
                 label: String = "",
-                @ViewBuilder content: @escaping (ResponseType) -> ResponseView) {
+                @ViewBuilder content: @escaping (ResponseType) -> ResponseView,
+                @ViewBuilder errorView: @escaping (Error) -> ErrorView = { _ in EmptyView() }) {
         var finalRequestable = requestable
         if let diskCache = diskCache {
             finalRequestable = AnyRequestable(CachedRequestableDecorator(cache: diskCache, key: key, requestable: requestable))
@@ -51,6 +57,6 @@ extension FetchedResponseView {
             finalRequestable = AnyRequestable(CachedTaskRequestableDecorator(cache: memoryCache, key: key, requestable: finalRequestable))
         }
         let vm = AnyViewModel(FetchResponseViewModel<ResponseType>(requestable: finalRequestable, label: label))
-        self.init(with: vm, content: content)
+        self.init(with: vm, content: content, errorView: errorView)
     }
 }

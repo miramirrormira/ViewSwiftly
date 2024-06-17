@@ -10,7 +10,15 @@ public enum LoadingStatus {
     case notRequested
     case loading
     case success
-    case error(Error)
+    case failure(Error)
+    
+    var error: Error? {
+        switch self {
+        case .failure(let error):
+            return error
+        default: return nil
+        }
+    }
 }
 
 extension LoadingStatus: Equatable {
@@ -22,7 +30,7 @@ extension LoadingStatus: Equatable {
             return true
         case (.success, .success):
             return true
-        case (.error(let errorLhs), .error(let errorRhs)):
+        case (.failure(let errorLhs), .failure(let errorRhs)):
             return errorLhs.localizedDescription == errorRhs.localizedDescription
         default:
             return false

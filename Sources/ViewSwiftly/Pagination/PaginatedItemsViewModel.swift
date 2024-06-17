@@ -51,7 +51,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable>: ViewMo
                 await mergeItemsStrategy.merge(vm: self, with: items)
                 try await onFetchItems?(items)
             } catch {
-                state.status = .error(error)
+                state.status = .failure(error)
             }
         case .refresh:
             refreshStrategy?.refresh(vm: self)
