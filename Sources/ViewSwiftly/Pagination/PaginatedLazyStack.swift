@@ -10,7 +10,7 @@ import SwiftUI
 
 public struct PaginatedLazyStack<T: Identifiable, ItemView: View, LoadingView: View, EmptyListView: View>: PaginatedItemsView {
     
-    @ObservedObject var viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>
+    @StateObject var viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>
     
     @ViewBuilder var itemView: (T) -> ItemView
     var loadingView: LoadingView
@@ -31,7 +31,7 @@ public struct PaginatedLazyStack<T: Identifiable, ItemView: View, LoadingView: V
                 axis: Axis.Set = .vertical,
                 verticalAlignment: VerticalAlignment = .center,
                 horizontalAlignment: HorizontalAlignment = .center) {
-        self.viewModel = viewModel
+        self._viewModel = StateObject(wrappedValue: viewModel)
         self.itemView = itemView
         self.loadingView = loadingView()
         self.emptyListView = emptyListView()
