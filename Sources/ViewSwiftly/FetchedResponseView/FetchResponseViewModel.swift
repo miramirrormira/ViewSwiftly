@@ -55,7 +55,7 @@ public class FetchResponseViewModel<ResponseType>: ViewModel {
     }
     
     deinit {
-        Logger.info("label: \(label), deinit \(Self.Type.self)")
+        Logger.info("\(label) deinit, ResponseType: \(ResponseType.Type.self)")
     }
 }
 

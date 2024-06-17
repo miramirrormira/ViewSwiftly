@@ -19,6 +19,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable>: ViewMo
     public var refreshStrategy: AnyRefreshStrategy<ItemType>?
     public var onFetchItems: (([ItemType]) async throws -> Void)?
     public var scrollDirection: ScrollDirection
+    let label: String
     
     public enum ScrollDirection {
         case up, down
@@ -28,12 +29,14 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable>: ViewMo
                 mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
                 refreshStrategy: AnyRefreshStrategy<ItemType>? = nil,
                 onFetchItems: (([ItemType]) async throws -> Void)? = nil,
-                scrollDirection: ScrollDirection = .down) {
+                scrollDirection: ScrollDirection = .down,
+                label: String = "") {
         self.requestable = requestable
         self.mergeItemsStrategy = mergeItemsStrategy
         self.refreshStrategy = refreshStrategy
         self.onFetchItems = onFetchItems
         self.scrollDirection = scrollDirection
+        self.label = label
     }
     
     @MainActor
@@ -72,6 +75,10 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable>: ViewMo
             firstItemOfLastPage == nil || item.id == firstItemOfLastPage!
         }
     }
+    
+    deinit {
+        Logger.debug("\(label) deinit, ItemType: \(ItemType.Type.self)")
+    }
 }
 
 public extension PaginatedItemsViewModel {
@@ -81,7 +88,8 @@ public extension PaginatedItemsViewModel {
                                           mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
                                           refreshStrategy: AnyRefreshStrategy<ItemType>? = nil,
                                           onFetchItems: (([ItemType]) async throws -> Void)? = nil,
-                                          transform: @escaping (PageType) -> [ItemType]) {
+                                          transform: @escaping (PageType) -> [ItemType],
+                                          label: String = "") {
         
         let requestable = PaginatedURLRequestCommand<PageType, ItemType>(networkConfiguration: networkConfiguration,
                                                                          endpoint: endpoint,
@@ -89,6 +97,6 @@ public extension PaginatedItemsViewModel {
                                                                          transform: transform)
         
         let anyRequestable = AnyRequestable<[ItemType]>(requestable)
-        self.init(requestable: anyRequestable, mergeItemsStrategy: mergeItemsStrategy, refreshStrategy: refreshStrategy, onFetchItems: onFetchItems)
+        self.init(requestable: anyRequestable, mergeItemsStrategy: mergeItemsStrategy, refreshStrategy: refreshStrategy, onFetchItems: onFetchItems, label: label)
     }
 }
