@@ -20,10 +20,10 @@ public struct FetchedResponseView<ResponseType, ResponseView: View, ErrorView: V
         Group {
             if let response = vm.state.response {
                 content(response)
-            } else if vm.state.status == .loading {
-                ProgressView()
             } else if let error = vm.state.status.error {
                 errorView(error)
+            } else {
+                ProgressView()
             }
         }
         .task {
