@@ -36,18 +36,22 @@ public class FetchResponseViewModel<ResponseType>: ViewModel {
                 try await responsePublisher
                     .publisher()
                     .receive(on: RunLoop.main)
-                    .sink { completion in
-                    switch completion {
-                    case .finished:
-                        self.state.status = .success
-                    case .failure(let error):
-                        self.state.status = .failure(error)
-                        Logger.error("\(self.label), failed fetching response: \(error.localizedDescription)")
+                    .sink { [weak self, label] completion in
+                        guard let strongSelf = self else {
+                            Logger.error("\(label), self is nil")
+                            return
+                        }
+                        switch completion {
+                        case .finished:
+                            strongSelf.state.status = .success
+                        case .failure(let error):
+                            strongSelf.state.status = .failure(error)
+                            Logger.error("\(strongSelf.label), failed fetching response: \(error.localizedDescription)")
+                        }
+                    } receiveValue: { value in
+                        self.state.response = value
                     }
-                } receiveValue: { value in
-                    self.state.response = value
-                }
-                .store(in: &cancellables)
+                    .store(in: &cancellables)
             } catch {
                 self.state.status = .failure(error)
             }
