@@ -34,10 +34,10 @@ public struct FetchedResponseView<ResponseType, ResponseView: View, ErrorView: V
 
 extension FetchedResponseView {
     
-    public init(with vm: AnyViewModel<FetchResponseState<ResponseType>, FetchResponseActions>,
+    public init(with vm: @autoclosure @escaping () -> AnyViewModel<FetchResponseState<ResponseType>, FetchResponseActions>,
                 @ViewBuilder content: @escaping (ResponseType) -> ResponseView,
                 @ViewBuilder errorView: @escaping (Error) -> ErrorView = { _ in EmptyView() }) {
-        self._vm = StateObject(wrappedValue: vm)
+        self._vm = StateObject(wrappedValue: vm())
         self.content = content
         self.errorView = errorView
     }
@@ -56,7 +56,8 @@ extension FetchedResponseView {
         if let memoryCache = memoryCache {
             finalRequestable = AnyRequestable(CachedTaskRequestableDecorator(cache: memoryCache, key: key, requestable: finalRequestable))
         }
-        let vm = AnyViewModel(FetchResponseViewModel<ResponseType>(requestable: finalRequestable, label: label))
-        self.init(with: vm, content: content, errorView: errorView)
+        self.init(with: AnyViewModel(FetchResponseViewModel<ResponseType>(requestable: finalRequestable, label: label)), 
+                  content: content,
+                  errorView: errorView)
     }
 }

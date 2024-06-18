@@ -77,7 +77,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable>: ViewMo
     }
     
     deinit {
-        Logger.debug("\(label) deinit, ItemType: \(ItemType.Type.self)")
+        Logger.debug("\(ItemType.Type.self), \(label)")
     }
 }
 

@@ -21,7 +21,7 @@ public struct PaginatedGrid<T: Identifiable, ItemView: View, LoadingView: View, 
     let axis: Axis.Set
     let layout: [GridItem]
     
-    public init(viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>,
+    public init(viewModel: @autoclosure @escaping () -> AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>,
                 itemView: @escaping (T) -> ItemView,
                 @ViewBuilder loadingView: () -> LoadingView = { EmptyView() },
                 @ViewBuilder emptyListView: () -> EmptyListView = { EmptyView() },
@@ -29,7 +29,7 @@ public struct PaginatedGrid<T: Identifiable, ItemView: View, LoadingView: View, 
                 edgeInsets: EdgeInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0),
                 enableRefresh: Bool = true,
                 axis: Axis.Set = .vertical) {
-        self._viewModel = StateObject(wrappedValue: viewModel)
+        self._viewModel = StateObject(wrappedValue: viewModel())
         self.itemView = itemView
         self.loadingView = loadingView()
         self.emptyListView = emptyListView()
