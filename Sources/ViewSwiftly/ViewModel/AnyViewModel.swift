@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 
+@dynamicMemberLookup
 public final class AnyViewModel<State, Action>: ViewModel {
     
     public let wrappedState: () -> State
@@ -30,5 +31,9 @@ public final class AnyViewModel<State, Action>: ViewModel {
         self.wrappedState = { viewModel.state }
         self.wrappedTrigger = viewModel.trigger(_:)
         self.wrappedObjectWillChange = { viewModel.objectWillChange }
+    }
+    
+    subscript<Value>(dynamicMember keyPath: KeyPath<State, Value>) -> Value {
+        self.state[keyPath: keyPath]
     }
 }
