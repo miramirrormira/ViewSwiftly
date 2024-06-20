@@ -17,7 +17,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable>: ViewMo
     public var lastItemOfLastPage: ItemType.ID?
     public var mergeItemsStrategy: MergeItemsStrategy
     public var refreshStrategy: AnyRefreshStrategy<ItemType>?
-    public var onFetchItems: (([ItemType]) async throws -> Void)?
+    public var onFetchItemsStrategy: OnFetchItemStrategy?
     public var scrollDirection: ScrollDirection
     let label: String
     
@@ -28,13 +28,13 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable>: ViewMo
     public init(requestable: AnyRequestable<[ItemType]>,
                 mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
                 refreshStrategy: AnyRefreshStrategy<ItemType>? = nil,
-                onFetchItems: (([ItemType]) async throws -> Void)? = nil,
+                onFetchItemsStrategy: OnFetchItemStrategy? = nil,
                 scrollDirection: ScrollDirection = .down,
                 label: String = "") {
         self.requestable = requestable
         self.mergeItemsStrategy = mergeItemsStrategy
         self.refreshStrategy = refreshStrategy
-        self.onFetchItems = onFetchItems
+        self.onFetchItemsStrategy = onFetchItemsStrategy
         self.scrollDirection = scrollDirection
         self.label = label
     }
@@ -52,7 +52,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable>: ViewMo
                 firstItemOfLastPage = items.first?.id
                 lastItemOfLastPage = items.last?.id
                 await mergeItemsStrategy.merge(vm: self, with: items)
-                try await onFetchItems?(items)
+                try await onFetchItemsStrategy?.onFetchItems(items)
             } catch {
                 state.status = .failure(error)
             }
@@ -87,7 +87,7 @@ public extension PaginatedItemsViewModel {
                                           paginationQueryStrategy: PaginationQueryStrategy,
                                           mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
                                           refreshStrategy: AnyRefreshStrategy<ItemType>? = nil,
-                                          onFetchItems: (([ItemType]) async throws -> Void)? = nil,
+                                          onFetchItemsStrategy: OnFetchItemStrategy? = nil,
                                           transform: @escaping (PageType) -> [ItemType],
                                           label: String = "") {
         
@@ -97,6 +97,6 @@ public extension PaginatedItemsViewModel {
                                                                          transform: transform)
         
         let anyRequestable = AnyRequestable<[ItemType]>(requestable)
-        self.init(requestable: anyRequestable, mergeItemsStrategy: mergeItemsStrategy, refreshStrategy: refreshStrategy, onFetchItems: onFetchItems, label: label)
+        self.init(requestable: anyRequestable, mergeItemsStrategy: mergeItemsStrategy, refreshStrategy: refreshStrategy, onFetchItemsStrategy: onFetchItemsStrategy, label: label)
     }
 }
