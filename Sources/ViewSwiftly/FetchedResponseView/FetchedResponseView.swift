@@ -17,11 +17,6 @@ public struct FetchedResponseView<ResponseType, ResponseView: View, ErrorView: V
     @ViewBuilder var errorView: (Error) -> ErrorView
     
     public var body: some View {
-        #if DEBUG
-        Logger.debug("printChanges")
-        let _ = Self._printChanges()
-        #endif
-        
         return Group {
             if let response = vm.state.response {
                 content(response)
