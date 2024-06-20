@@ -1,6 +1,6 @@
 //
 //  AnyFetchItemsStrategy.swift
-//  
+//
 //
 //  Created by Mira Yang on 6/20/24.
 //
@@ -13,7 +13,7 @@ public class AnyFetchItemsStrategy<ItemType>: FetchItemsStrategy {
     
     let wrappedOnFetchItems: ([Item]) async throws -> Void
     
-    init<V: FetchItemsStrategy>(_ strategy: V) where V.Item == ItemType {
+    public init<V: FetchItemsStrategy>(_ strategy: V) where V.Item == ItemType {
         self.wrappedOnFetchItems = strategy.onFetchItems(_:)
     }
     
