@@ -96,10 +96,10 @@ final class PaginatedItemsViewModelTests: XCTestCase {
         let requestable = RequestableStub(returning: newItems)
         
         var calledOnFetchItems = false
-        let onFetchItems: ([Item]) async throws -> Void = { _ in
+        let fetchItemsStrategySpy = FetchItemsStrategySpy<Item> { _ in
             calledOnFetchItems = true
         }
-        let sut = PaginatedItemsViewModel(requestable: AnyRequestable(requestable), onFetchItems: onFetchItems)
+        let sut = PaginatedItemsViewModel(requestable: AnyRequestable(requestable), fetchItemsStrategy: .init(fetchItemsStrategySpy))
         await sut.trigger(.requestNextPage)
         XCTAssertTrue(calledOnFetchItems)
     }
@@ -120,12 +120,14 @@ final class PaginatedItemsViewModelTests: XCTestCase {
         let endpoint = Endpoint.fixture()
         let paginationQueryStrategy = PageBasedQueryStrategy.fixture()
         var calledOnFetchItems = false
-        let onFetchItems: ([Item]) async throws -> Void = { _ in calledOnFetchItems = true }
+        let fetchItemsStrategySpy = FetchItemsStrategySpy<Item> { _ in
+            calledOnFetchItems = true
+        }
         let transform: (Page) -> [Item] = { $0.items }
-        let sut = PaginatedItemsViewModel<Item>(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, onFetchItems: onFetchItems, transform: transform)
+        let sut = PaginatedItemsViewModel<Item>(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, fetchItemsStrategy: .init(fetchItemsStrategySpy), transform: transform)
         XCTAssertFalse(calledOnFetchItems)
-        XCTAssertNotNil(sut.onFetchItems)
-        try await sut.onFetchItems?([])
+        XCTAssertNotNil(sut.fetchItemsStrategy)
+        try await sut.fetchItemsStrategy?.onFetchItems([])
         XCTAssertTrue(calledOnFetchItems)
     }
 }

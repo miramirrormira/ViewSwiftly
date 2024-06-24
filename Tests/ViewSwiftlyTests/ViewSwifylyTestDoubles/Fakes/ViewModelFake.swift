@@ -19,7 +19,7 @@ class ViewModelFake: ViewModel {
     func trigger(_ action: ViewModelFakeAction) {
         switch action {
         case .increaseValue:
-            state.value += 1
+            state.value! += 1
         }
     }
     

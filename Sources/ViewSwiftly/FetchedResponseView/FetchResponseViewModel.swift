@@ -1,5 +1,5 @@
 //
-//  AssetViewModel.swift
+//  FetchResponseViewModel.swift
 //
 //
 //  Created by Mira Yang on 6/14/24.

@@ -1,19 +1,19 @@
 @testable import ViewSwiftly
-@testable import NetSwiftly
-import Combine
 import XCTest
+import Combine
+import NetSwiftly
 
-final class RequestResponseSubjectTests: XCTestCase {
+final class ResponsePublisherDecoratorTests: XCTestCase {
 
     func test_publisher_withSuccessReturn1_shouldPublish1() async throws {
-        let requestableStub = RequestableStub(returning: 1)
-        let sut = RequestResponseSubject<Int>(requestable: .init(requestableStub))
-        var cancellables = Set<AnyCancellable>()
         
+        let publisherStub = ResponsePublisherStub(returning: 1)
+        let sut = ResponsePublisherDecorator(responsePublisher: .init(publisherStub))
+        var cancellables = Set<AnyCancellable>()
         var receivedValue = Int.min
         let expectation = expectation(description: "wait_for_published_value")
         
-        sut.publisher()
+        try await sut.publisher()
             .sink { _ in
             } receiveValue: { value in
                 receivedValue = value
@@ -27,13 +27,14 @@ final class RequestResponseSubjectTests: XCTestCase {
     }
     
     func test_publisher_withFailure_shouldPublishCorrectError() async throws {
-        let requestableStub = RequestableStub<Int>(error: NetworkingClientSideError.cannotGenerateURL)
-        let sut = RequestResponseSubject<Int>(requestable: .init(requestableStub))
-        var cancellables = Set<AnyCancellable>()
         
+        let publisherStub = ResponsePublisherStub<Void>(error: NetworkingClientSideError.cannotGenerateURL)
+        let sut = ResponsePublisherDecorator(responsePublisher: .init(publisherStub))
+        
+        var cancellables = Set<AnyCancellable>()
         let expectation = expectation(description: "wait_for_published_value")
         var receivedError: Error?
-        sut.publisher()
+        try await sut.publisher()
             .sink { completion in
                 switch completion {
                 case .finished:
