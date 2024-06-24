@@ -13,7 +13,9 @@ public class AppendItems: MergeItemsStrategy {
     public init() { }
     
     @MainActor
-    public func merge<ItemType>(vm: PaginatedItemsViewModel<ItemType>, with newItems: [ItemType]) async {
-        vm.state.items.append(contentsOf: newItems)
+    public func merge<ItemType, ItemStateType>(vm: PaginatedItemsViewModel<ItemType, ItemStateType>, with newItems: [ItemType]) async throws {
+        
+        let itemStates = try await newItems.concurrentMap(vm.itemState)
+        vm.state.items.append(contentsOf: itemStates)
     }
 }

@@ -6,42 +6,42 @@ final class PaginatedItemsViewModelTests: XCTestCase {
 
     func test_attemptLoadNextPage_with_down_scrollDirection_should_return_true_when_the_sut_initialized() throws {
         let requestable = RequestableDummy<[Item]>()
-        let sut = PaginatedItemsViewModel<Item>(requestable: AnyRequestable(requestable))
+        let sut = PaginatedItemsViewModel<Item, Item>(requestable: AnyRequestable(requestable))
         XCTAssertNil(sut.firstItemOfLastPage)
         XCTAssertTrue(sut.shouldRequestNextPage(by: Item(id: "")))
     }
     
     func test_attemptLoadNextPage_with_up_scrollDirection_should_return_true_when_the_sut_initialized() throws {
         let requestable = RequestableDummy<[Item]>()
-        let sut = PaginatedItemsViewModel<Item>(requestable: AnyRequestable(requestable), scrollDirection: .up)
+        let sut = PaginatedItemsViewModel<Item, Item>(requestable: AnyRequestable(requestable), scrollDirection: .up)
         XCTAssertNil(sut.lastItemOfLastPage)
         XCTAssertTrue(sut.shouldRequestNextPage(by: Item(id: "")))
     }
     
     func test_attemptLoadNextPage_with_down_scrollDirection_by_item_unidentical_to_firstItemOfLastPage_should_return_false() async throws {
         let requestable = RequestableStub(returning: [Item(id: "0"), Item(id: "1")])
-        let sut = PaginatedItemsViewModel<Item>(requestable: AnyRequestable(requestable))
+        let sut = PaginatedItemsViewModel<Item, Item>(requestable: AnyRequestable(requestable))
         await sut.trigger(.requestNextPage)
         XCTAssertFalse(sut.shouldRequestNextPage(by: Item(id: "1")))
     }
     
     func test_attemptLoadNextPage_with_up_scrollDirection_by_item_unidentical_to_lastItemOfLastPage_should_return_false() async throws {
         let requestable = RequestableStub(returning: [Item(id: "0"), Item(id: "1")])
-        let sut = PaginatedItemsViewModel<Item>(requestable: AnyRequestable(requestable), scrollDirection: .up)
+        let sut = PaginatedItemsViewModel<Item, Item>(requestable: AnyRequestable(requestable), scrollDirection: .up)
         await sut.trigger(.requestNextPage)
         XCTAssertFalse(sut.shouldRequestNextPage(by: Item(id: "0")))
     }
     
     func test_attemptLoadNextPage_with_down_scrollDirection_by_item_identical_to_firstItemOfLastPage_should_return_true() async throws {
         let requestable = RequestableStub(returning: [Item(id: "0"), Item(id: "1")])
-        let sut = PaginatedItemsViewModel<Item>(requestable: AnyRequestable(requestable))
+        let sut = PaginatedItemsViewModel<Item, Item>(requestable: AnyRequestable(requestable))
         await sut.trigger(.requestNextPage)
         XCTAssertTrue(sut.shouldRequestNextPage(by: Item(id: "0")))
     }
     
     func test_attemptLoadNextPage_with_up_scrollDirection_by_item_identical_to_lastItemOfLastPage_should_return_true() async throws {
         let requestable = RequestableStub(returning: [Item(id: "0"), Item(id: "1")])
-        let sut = PaginatedItemsViewModel<Item>(requestable: AnyRequestable(requestable), scrollDirection: .up)
+        let sut = PaginatedItemsViewModel<Item, Item>(requestable: AnyRequestable(requestable), scrollDirection: .up)
         await sut.trigger(.requestNextPage)
         XCTAssertTrue(sut.shouldRequestNextPage(by: Item(id: "1")))
     }
@@ -49,7 +49,7 @@ final class PaginatedItemsViewModelTests: XCTestCase {
     @MainActor
     func test_requestNextPage_with_status_equal_to_loading_should_not_fetch_new_items() async throws {
         let requestable = RequestableStub(returning: [Item(id: "0"), Item(id: "1")])
-        let sut = PaginatedItemsViewModel<Item>(requestable: AnyRequestable(requestable))
+        let sut = PaginatedItemsViewModel<Item, Item>(requestable: AnyRequestable(requestable))
         sut.state.status = .loading
         await sut.trigger(.requestNextPage)
         XCTAssertTrue(sut.state.items.isEmpty)
@@ -59,7 +59,7 @@ final class PaginatedItemsViewModelTests: XCTestCase {
     func test_requestNextPage_with_success_new_items_should_fetch_new_items() async throws {
         let newItems = [Item(id: "0")]
         let requestable = RequestableStub(returning: newItems)
-        let sut = PaginatedItemsViewModel<Item>(requestable: AnyRequestable(requestable))
+        let sut = PaginatedItemsViewModel<Item, Item>(requestable: AnyRequestable(requestable))
         XCTAssertFalse(sut.state.items.contains(where: { item in
             item.id == "0"
         }))
@@ -74,7 +74,7 @@ final class PaginatedItemsViewModelTests: XCTestCase {
     func test_requestNextPage_with_success_new_items_status_should_be_success() async throws {
         let newItems = [Item(id: "0")]
         let requestable = RequestableStub(returning: newItems)
-        let sut = PaginatedItemsViewModel<Item>(requestable: AnyRequestable(requestable))
+        let sut = PaginatedItemsViewModel<Item, Item>(requestable: AnyRequestable(requestable))
         XCTAssertNotEqual(sut.state.status, .success)
         await sut.trigger(.requestNextPage)
         XCTAssertEqual(sut.state.status, .success)
@@ -84,7 +84,7 @@ final class PaginatedItemsViewModelTests: XCTestCase {
     func test_requestNextPage_with_failure_error_should_get_error() async throws {
         
         let requestable = RequestableStub<[Item]>(error: NetworkingClientSideError.cannotGenerateURL)
-        let sut = PaginatedItemsViewModel<Item>(requestable: AnyRequestable(requestable))
+        let sut = PaginatedItemsViewModel<Item, Item>(requestable: AnyRequestable(requestable))
         XCTAssertEqual(sut.state.status, .notRequested)
         await sut.trigger(.requestNextPage)
         XCTAssertEqual(sut.state.status, LoadingStatus.failure(NetworkingClientSideError.cannotGenerateURL))
@@ -110,7 +110,7 @@ final class PaginatedItemsViewModelTests: XCTestCase {
         let paginationQueryStrategy = PageBasedQueryStrategy.fixture()
         let mergeItemsStrategy = AppendItems()
         let transform: (Page) -> [Item] = { $0.items }
-        let sut = PaginatedItemsViewModel<Item>(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, mergeItemsStrategy: mergeItemsStrategy, transform: transform)
+        let sut = PaginatedItemsViewModel<Item, Item>(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, mergeItemsStrategy: mergeItemsStrategy, transform: transform)
         
         XCTAssertIdentical(sut.mergeItemsStrategy as? AppendItems, mergeItemsStrategy)
     }
@@ -124,7 +124,7 @@ final class PaginatedItemsViewModelTests: XCTestCase {
             calledOnFetchItems = true
         }
         let transform: (Page) -> [Item] = { $0.items }
-        let sut = PaginatedItemsViewModel<Item>(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, fetchItemsStrategy: .init(fetchItemsStrategySpy), transform: transform)
+        let sut = PaginatedItemsViewModel<Item, Item>(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, fetchItemsStrategy: .init(fetchItemsStrategySpy), transform: transform)
         XCTAssertFalse(calledOnFetchItems)
         XCTAssertNotNil(sut.fetchItemsStrategy)
         try await sut.fetchItemsStrategy?.onFetchItems([])

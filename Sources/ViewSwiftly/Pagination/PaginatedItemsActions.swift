@@ -7,9 +7,9 @@
 
 import Foundation
 
-public enum PaginatedItemsActions<ItemType> {
+public enum PaginatedItemsActions<ItemStateType> {
     case requestNextPage
-    case onAppear(item: ItemType)
+    case onAppear(item: ItemStateType)
     case refresh
-    case filter(predicate: (ItemType) -> Bool)
+    case filter(predicate: (ItemStateType) -> Bool)
 }

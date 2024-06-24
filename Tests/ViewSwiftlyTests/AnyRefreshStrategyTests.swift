@@ -5,10 +5,13 @@ import XCTest
 final class AnyRefreshStrategyTests: XCTestCase {
 
     func test_refresh() throws {
-        let strategy = RefreshStrategySpy<Page>()
+        var calledRefresh = false
+        let strategy = RefreshStrategySpy<Page, Page>(callRefresh: {
+            calledRefresh = true
+        })
         let sut = AnyRefreshStrategy(strategy)
-        XCTAssertFalse(strategy.calledRefresh)
+        XCTAssertFalse(calledRefresh)
         sut.refresh(vm: PaginatedItemsViewModel(requestable: AnyRequestable.init(RequestableDummy())))
-        XCTAssertTrue(strategy.calledRefresh)
+        XCTAssertTrue(calledRefresh)
     }
 }

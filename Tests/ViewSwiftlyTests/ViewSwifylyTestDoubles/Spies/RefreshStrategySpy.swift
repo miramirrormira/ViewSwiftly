@@ -8,12 +8,16 @@
 import Foundation
 import ViewSwiftly
 
-class RefreshStrategySpy<T: Decodable & Identifiable>: RefreshStrategy {
+class RefreshStrategySpy<T: Decodable & Identifiable, S: Identifiable>: RefreshStrategy {
+    typealias ItemStateType = S
     typealias ItemType = T
     
-    var calledRefresh: Bool = false
+    var callRefresh: () -> Void
+    init(callRefresh: @escaping () -> Void) {
+        self.callRefresh = callRefresh
+    }
     
-    func refresh(vm: PaginatedItemsViewModel<ItemType>) {
-        calledRefresh = true
+    func refresh(vm: PaginatedItemsViewModel<ItemType, ItemStateType>) {
+        callRefresh()
     }
 }

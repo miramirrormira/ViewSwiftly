@@ -9,16 +9,17 @@ import Foundation
 import NetSwiftly
 import Combine
 
-public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable>: ViewModel {
+public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable, ItemStateType: Identifiable>: ViewModel {
     
-    @MainActor @Published public var state = PaginatedItemsState<ItemType>()
+    @MainActor @Published public var state = PaginatedItemsState<ItemStateType>()
     public var requestable: AnyRequestable<[ItemType]>
-    public var firstItemOfLastPage: ItemType.ID?
-    public var lastItemOfLastPage: ItemType.ID?
+    public var firstItemOfLastPage: ItemStateType.ID?
+    public var lastItemOfLastPage: ItemStateType.ID?
     public var mergeItemsStrategy: MergeItemsStrategy
-    public var refreshStrategy: AnyRefreshStrategy<ItemType>?
+    public var refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>?
     public var fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>?
     public var scrollDirection: ScrollDirection
+    let itemState: (ItemType) async throws -> ItemStateType
     let label: String
     
     public enum ScrollDirection {
@@ -27,20 +28,37 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable>: ViewMo
     
     public init(requestable: AnyRequestable<[ItemType]>,
                 mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
-                refreshStrategy: AnyRefreshStrategy<ItemType>? = nil,
+                refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>? = nil,
                 fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
                 scrollDirection: ScrollDirection = .down,
-                label: String = "") {
+                label: String = "",
+                itemState: @escaping (ItemType) async throws -> ItemStateType) {
         self.requestable = requestable
         self.mergeItemsStrategy = mergeItemsStrategy
         self.refreshStrategy = refreshStrategy
         self.fetchItemsStrategy = fetchItemsStrategy
         self.scrollDirection = scrollDirection
         self.label = label
+        self.itemState = itemState
+    }
+    
+    public init(requestable: AnyRequestable<[ItemType]>,
+                mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
+                refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>? = nil,
+                fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
+                scrollDirection: ScrollDirection = .down,
+                label: String = "") where ItemType == ItemStateType, ItemStateType: Identifiable{
+        self.requestable = requestable
+        self.mergeItemsStrategy = mergeItemsStrategy
+        self.refreshStrategy = refreshStrategy
+        self.fetchItemsStrategy = fetchItemsStrategy
+        self.scrollDirection = scrollDirection
+        self.label = label
+        self.itemState = { $0 }
     }
     
     @MainActor
-    public func trigger(_ action: PaginatedItemsActions<ItemType>) async {
+    public func trigger(_ action: PaginatedItemsActions<ItemStateType>) async {
         switch action {
         case .requestNextPage:
             guard state.status != .loading else { return }
@@ -49,9 +67,10 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable>: ViewMo
                 let items = try await requestable.request()
                 state.firstPageLoaded = true
                 state.status = .success
-                firstItemOfLastPage = items.first?.id
-                lastItemOfLastPage = items.last?.id
-                await mergeItemsStrategy.merge(vm: self, with: items)
+                
+                try await mergeItemsStrategy.merge(vm: self, with: items)
+                firstItemOfLastPage = state.items.first?.id
+                lastItemOfLastPage = state.items.last?.id
                 try await fetchItemsStrategy?.onFetchItems(items)
             } catch {
                 state.status = .failure(error)
@@ -67,7 +86,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable>: ViewMo
         }
     }
     
-    func shouldRequestNextPage(by item: ItemType) -> Bool {
+    func shouldRequestNextPage(by item: ItemStateType) -> Bool {
         switch scrollDirection {
         case .up:
             lastItemOfLastPage == nil || item.id == lastItemOfLastPage!
@@ -86,10 +105,29 @@ public extension PaginatedItemsViewModel {
                                           endpoint: Endpoint,
                                           paginationQueryStrategy: PaginationQueryStrategy,
                                           mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
-                                          refreshStrategy: AnyRefreshStrategy<ItemType>? = nil,
+                                          refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>? = nil,
                                           fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
                                           transform: @escaping (PageType) -> [ItemType],
-                                          label: String = "") {
+                                          label: String = "",
+                                          itemState: @escaping (ItemType) async throws -> ItemStateType) {
+        
+        let requestable = PaginatedURLRequestCommand<PageType, ItemType>(networkConfiguration: networkConfiguration,
+                                                                         endpoint: endpoint,
+                                                                         paginationQueryStrategy: paginationQueryStrategy,
+                                                                         transform: transform)
+        
+        let anyRequestable = AnyRequestable<[ItemType]>(requestable)
+        self.init(requestable: anyRequestable, mergeItemsStrategy: mergeItemsStrategy, refreshStrategy: refreshStrategy, fetchItemsStrategy: fetchItemsStrategy, label: label, itemState: itemState)
+    }
+    
+    convenience init<PageType: Decodable>(networkConfiguration: NetworkConfiguration,
+                                          endpoint: Endpoint,
+                                          paginationQueryStrategy: PaginationQueryStrategy,
+                                          mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
+                                          refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>? = nil,
+                                          fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
+                                          transform: @escaping (PageType) -> [ItemType],
+                                          label: String = "") where ItemType == ItemStateType {
         
         let requestable = PaginatedURLRequestCommand<PageType, ItemType>(networkConfiguration: networkConfiguration,
                                                                          endpoint: endpoint,
