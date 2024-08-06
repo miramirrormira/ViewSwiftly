@@ -19,7 +19,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable, ItemSta
     public var refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>?
     public var fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>?
     public var scrollDirection: ScrollDirection
-    let itemState: (ItemType) async throws -> ItemStateType
+    public let itemState: (ItemType) async throws -> ItemStateType
     let label: String
     
     public enum ScrollDirection {
