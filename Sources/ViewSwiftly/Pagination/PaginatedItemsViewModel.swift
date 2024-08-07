@@ -27,7 +27,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable, ItemSta
     }
     
     public init(requestable: AnyRequestable<[ItemType]>,
-                mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType> = .init(AppendItems<ItemType, ItemStateType>()),
+                mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType> = AnyMergeItemsStrategy<ItemType, ItemStateType>(AppendItems()),
                 refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>? = nil,
                 fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
                 scrollDirection: ScrollDirection = .down,
@@ -43,11 +43,11 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable, ItemSta
     }
     
     public init(requestable: AnyRequestable<[ItemType]>,
-                mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType> = .init(AppendItems<ItemType, ItemStateType>()),
+                mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType> = AnyMergeItemsStrategy<ItemType, ItemStateType>(AppendItems()),
                 refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>? = nil,
                 fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
                 scrollDirection: ScrollDirection = .down,
-                label: String = "") where ItemType == ItemStateType, ItemStateType: Identifiable{
+                label: String = "") where ItemType == ItemStateType, ItemStateType: Identifiable {
         self.requestable = requestable
         self.mergeItemsStrategy = mergeItemsStrategy
         self.refreshStrategy = refreshStrategy
