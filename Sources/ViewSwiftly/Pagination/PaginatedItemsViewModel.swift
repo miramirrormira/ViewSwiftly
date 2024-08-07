@@ -109,7 +109,7 @@ public extension PaginatedItemsViewModel {
                                           fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
                                           transform: @escaping (PageType) -> [ItemType],
                                           label: String = "",
-                                          itemState: @escaping (ItemType) async throws -> ItemStateType) {
+                                          toItemState: @escaping (ItemType) async throws -> ItemStateType) {
         
         let requestable = PaginatedURLRequestCommand<PageType, ItemType>(networkConfiguration: networkConfiguration,
                                                                          endpoint: endpoint,
@@ -117,7 +117,7 @@ public extension PaginatedItemsViewModel {
                                                                          transform: transform)
         
         let anyRequestable = AnyRequestable<[ItemType]>(requestable)
-        self.init(requestable: anyRequestable, mergeItemsStrategy: mergeItemsStrategy, refreshStrategy: refreshStrategy, fetchItemsStrategy: fetchItemsStrategy, label: label, itemState: itemState)
+        self.init(requestable: anyRequestable, mergeItemsStrategy: mergeItemsStrategy, refreshStrategy: refreshStrategy, fetchItemsStrategy: fetchItemsStrategy, label: label, toItemState: toItemState)
     }
     
     convenience init<PageType: Decodable>(networkConfiguration: NetworkConfiguration,
