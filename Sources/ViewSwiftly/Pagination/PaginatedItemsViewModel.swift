@@ -27,7 +27,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable, ItemSta
     }
     
     public init(requestable: AnyRequestable<[ItemType]>,
-                mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType> = .init(AppendItems()),
+                mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType> = .init(AppendItems<ItemType, ItemStateType>()),
                 refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>? = nil,
                 fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
                 scrollDirection: ScrollDirection = .down,
@@ -43,7 +43,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable, ItemSta
     }
     
     public init(requestable: AnyRequestable<[ItemType]>,
-                mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType> = .init(AppendItems()),
+                mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType> = .init(AppendItems<ItemType, ItemStateType>()),
                 refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>? = nil,
                 fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
                 scrollDirection: ScrollDirection = .down,
