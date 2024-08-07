@@ -15,7 +15,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable, ItemSta
     public var requestable: AnyRequestable<[ItemType]>
     public var firstItemOfLastPage: ItemStateType.ID?
     public var lastItemOfLastPage: ItemStateType.ID?
-    public var mergeItemsStrategy: MergeItemsStrategy
+    public var mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType>
     public var refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>?
     public var fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>?
     public var scrollDirection: ScrollDirection
@@ -27,7 +27,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable, ItemSta
     }
     
     public init(requestable: AnyRequestable<[ItemType]>,
-                mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
+                mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType> = .init(AppendItems()),
                 refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>? = nil,
                 fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
                 scrollDirection: ScrollDirection = .down,
@@ -43,7 +43,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable, ItemSta
     }
     
     public init(requestable: AnyRequestable<[ItemType]>,
-                mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
+                mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType> = .init(AppendItems()),
                 refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>? = nil,
                 fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
                 scrollDirection: ScrollDirection = .down,
@@ -104,7 +104,7 @@ public extension PaginatedItemsViewModel {
     convenience init<PageType: Decodable>(networkConfiguration: NetworkConfiguration,
                                           endpoint: Endpoint,
                                           paginationQueryStrategy: PaginationQueryStrategy,
-                                          mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
+                                          mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType> = .init(AppendItems()),
                                           refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>? = nil,
                                           fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
                                           transform: @escaping (PageType) -> [ItemType],
@@ -123,7 +123,7 @@ public extension PaginatedItemsViewModel {
     convenience init<PageType: Decodable>(networkConfiguration: NetworkConfiguration,
                                           endpoint: Endpoint,
                                           paginationQueryStrategy: PaginationQueryStrategy,
-                                          mergeItemsStrategy: MergeItemsStrategy = AppendItems(),
+                                          mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType> = .init(AppendItems()),
                                           refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>? = nil,
                                           fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
                                           transform: @escaping (PageType) -> [ItemType],

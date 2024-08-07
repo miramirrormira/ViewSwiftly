@@ -108,11 +108,12 @@ final class PaginatedItemsViewModelTests: XCTestCase {
         let networkConfiguration = NetworkConfiguration.fixture()
         let endpoint = Endpoint.fixture()
         let paginationQueryStrategy = PageBasedQueryStrategy.fixture()
-        let mergeItemsStrategy = AppendItems()
+        let anyMergeItemsStrategy = AnyMergeItemsStrategy<Item, Item>(AppendItems())
         let transform: (Page) -> [Item] = { $0.items }
-        let sut = PaginatedItemsViewModel(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, mergeItemsStrategy: mergeItemsStrategy, transform: transform)
+        let sut = PaginatedItemsViewModel(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, mergeItemsStrategy: anyMergeItemsStrategy, transform: transform)
         
-        XCTAssertIdentical(sut.mergeItemsStrategy as? AppendItems, mergeItemsStrategy)
+        XCTAssertIdentical(sut.mergeItemsStrategy, anyMergeItemsStrategy)
+    
     }
     
     func test_convenient_init_for_url_requestables_onFetchItems_should_be_triggered() async throws {

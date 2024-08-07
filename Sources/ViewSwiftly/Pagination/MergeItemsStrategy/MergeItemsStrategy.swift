@@ -7,5 +7,7 @@
 
 import Foundation
 public protocol MergeItemsStrategy {
-    func merge<ItemType, ItemStateType>(vm: PaginatedItemsViewModel<ItemType, ItemStateType>, with newItems: [ItemType]) async throws
+    associatedtype ItemType: Decodable & Identifiable
+    associatedtype ItemStateType: Identifiable
+    func merge(vm: PaginatedItemsViewModel<ItemType, ItemStateType>, with newItems: [ItemType]) async throws
 }
