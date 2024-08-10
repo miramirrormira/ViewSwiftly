@@ -22,6 +22,9 @@ public struct PaginatedLazyStack<T: Identifiable, ItemView: View, LoadingView: V
     let verticalAlignment: VerticalAlignment
     let horizontalAlignment: HorizontalAlignment
     
+    let scrollDidStart: () -> Void
+    let scrollDidEnd: () -> Void
+    
     public init(viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>,
                 itemView: @escaping (T) -> ItemView,
                 @ViewBuilder loadingView: () -> LoadingView = { EmptyView() },
@@ -30,7 +33,9 @@ public struct PaginatedLazyStack<T: Identifiable, ItemView: View, LoadingView: V
                 enableRefresh: Bool = true,
                 axis: Axis.Set = .vertical,
                 verticalAlignment: VerticalAlignment = .center,
-                horizontalAlignment: HorizontalAlignment = .center) {
+                horizontalAlignment: HorizontalAlignment = .center,
+                scrollDidStart: @escaping () -> Void = { },
+                scrollDidEnd: @escaping () -> Void = { }) {
         self.viewModel = viewModel
         self.itemView = itemView
         self.loadingView = loadingView()
@@ -40,6 +45,8 @@ public struct PaginatedLazyStack<T: Identifiable, ItemView: View, LoadingView: V
         self.axis = axis
         self.verticalAlignment = verticalAlignment
         self.horizontalAlignment = horizontalAlignment
+        self.scrollDidStart = scrollDidStart
+        self.scrollDidEnd = scrollDidEnd
     }
     
     public var body: some View {
@@ -50,11 +57,16 @@ public struct PaginatedLazyStack<T: Identifiable, ItemView: View, LoadingView: V
     func listView() -> some View {
         if axis == .vertical {
             ScrollView(.vertical) {
-                LazyVStack(alignment: horizontalAlignment, spacing: 0) {
-                    items
+                ZStack {
+                    ScrollViewActionsReader()
+                        .scrollDidStart(scrollDidStart)
+                        .scrollDidEnd(scrollDidEnd)
+                    LazyVStack(alignment: horizontalAlignment, spacing: 0) {
+                        items
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(edgeInsets)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(edgeInsets)
             }
             .scrollIndicators(.hidden)
             .if(enableRefresh) { view in
@@ -65,11 +77,16 @@ public struct PaginatedLazyStack<T: Identifiable, ItemView: View, LoadingView: V
             
         } else if axis == .horizontal {
             ScrollView(.horizontal) {
-                LazyHStack(alignment: verticalAlignment, spacing: 0) {
-                    items
+                ZStack {
+                    ScrollViewActionsReader()
+                        .scrollDidStart(scrollDidStart)
+                        .scrollDidEnd(scrollDidEnd)
+                    LazyHStack(alignment: verticalAlignment, spacing: 0) {
+                        items
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(edgeInsets)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(edgeInsets)
             }
             .scrollIndicators(.hidden)
             .if(enableRefresh) { view in

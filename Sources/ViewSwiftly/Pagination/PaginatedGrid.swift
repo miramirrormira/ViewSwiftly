@@ -21,6 +21,9 @@ public struct PaginatedGrid<T: Identifiable, ItemView: View, LoadingView: View, 
     let axis: Axis.Set
     let layout: [GridItem]
     
+    let scrollDidStart: () -> Void
+    let scrollDidEnd: () -> Void
+    
     public init(viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>,
                 itemView: @escaping (T) -> ItemView,
                 @ViewBuilder loadingView: () -> LoadingView = { EmptyView() },
@@ -28,7 +31,9 @@ public struct PaginatedGrid<T: Identifiable, ItemView: View, LoadingView: View, 
                 layout: [GridItem],
                 edgeInsets: EdgeInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0),
                 enableRefresh: Bool = true,
-                axis: Axis.Set = .vertical) {
+                axis: Axis.Set = .vertical,
+                scrollDidStart: @escaping () -> Void = { },
+                scrollDidEnd: @escaping () -> Void = { }) {
         self.viewModel = viewModel
         self.itemView = itemView
         self.loadingView = loadingView()
@@ -37,6 +42,8 @@ public struct PaginatedGrid<T: Identifiable, ItemView: View, LoadingView: View, 
         self.enableRefresh = enableRefresh
         self.axis = axis
         self.layout = layout
+        self.scrollDidStart = scrollDidStart
+        self.scrollDidEnd = scrollDidEnd
     }
     
     public var body: some View {
@@ -47,25 +54,35 @@ public struct PaginatedGrid<T: Identifiable, ItemView: View, LoadingView: View, 
     func listView() -> some View {
         if axis == .horizontal {
             ScrollView(.horizontal) {
-                LazyHGrid(rows: layout, spacing: 0) {
-                    items
-                }
-                .padding(edgeInsets)
-                .if(enableRefresh) { view in
-                    view.refreshable {
-                        await viewModel.trigger(.refresh)
+                ZStack {
+                    ScrollViewActionsReader()
+                        .scrollDidStart(scrollDidStart)
+                        .scrollDidEnd(scrollDidEnd)
+                    LazyHGrid(rows: layout, spacing: 0) {
+                        items
+                    }
+                    .padding(edgeInsets)
+                    .if(enableRefresh) { view in
+                        view.refreshable {
+                            await viewModel.trigger(.refresh)
+                        }
                     }
                 }
             }
         } else if axis == .vertical {
             ScrollView(.vertical) {
-                LazyVGrid(columns: layout, spacing: 0) {
-                    items
-                }
-                .padding(edgeInsets)
-                .if(enableRefresh) { view in
-                    view.refreshable {
-                        await viewModel.trigger(.refresh)
+                ZStack {
+                    ScrollViewActionsReader()
+                        .scrollDidStart(scrollDidStart)
+                        .scrollDidEnd(scrollDidEnd)
+                    LazyVGrid(columns: layout, spacing: 0) {
+                        items
+                    }
+                    .padding(edgeInsets)
+                    .if(enableRefresh) { view in
+                        view.refreshable {
+                            await viewModel.trigger(.refresh)
+                        }
                     }
                 }
             }
