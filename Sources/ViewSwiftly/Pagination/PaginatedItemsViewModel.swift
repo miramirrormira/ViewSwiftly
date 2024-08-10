@@ -46,7 +46,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable, ItemSta
                 mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType> = AnyMergeItemsStrategy<ItemType, ItemStateType>(AppendItems()),
                 refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>? = nil,
                 fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
-                scrollDirection: ScrollDirection = .down,
+                scrollDirection: ScrollDirection = .up,
                 label: String = "") where ItemType == ItemStateType, ItemStateType: Identifiable {
         self.requestable = requestable
         self.mergeItemsStrategy = mergeItemsStrategy
