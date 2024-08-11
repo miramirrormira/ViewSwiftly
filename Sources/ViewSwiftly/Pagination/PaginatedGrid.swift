@@ -52,37 +52,18 @@ public struct PaginatedGrid<T: Identifiable, ItemView: View, LoadingView: View, 
     
     @ViewBuilder
     func listView() -> some View {
-        if axis == .horizontal {
-            ScrollView(.horizontal) {
-                ZStack {
-                    ScrollViewActionsReader()
-                        .scrollDidStart(scrollDidStart)
-                        .scrollDidEnd(scrollDidEnd)
-                    LazyHGrid(rows: layout, spacing: 0) {
-                        items
-                    }
-                    .padding(edgeInsets)
-                    .if(enableRefresh) { view in
-                        view.refreshable {
-                            await viewModel.trigger(.refresh)
-                        }
-                    }
+        ScrollView(axis) {
+            ZStack {
+                ScrollViewActionsReader()
+                    .scrollDidStart(scrollDidStart)
+                    .scrollDidEnd(scrollDidEnd)
+                LazyVGrid(columns: layout, spacing: 0) {
+                    items
                 }
-            }
-        } else if axis == .vertical {
-            ScrollView(.vertical) {
-                ZStack {
-                    ScrollViewActionsReader()
-                        .scrollDidStart(scrollDidStart)
-                        .scrollDidEnd(scrollDidEnd)
-                    LazyVGrid(columns: layout, spacing: 0) {
-                        items
-                    }
-                    .padding(edgeInsets)
-                    .if(enableRefresh) { view in
-                        view.refreshable {
-                            await viewModel.trigger(.refresh)
-                        }
+                .padding(edgeInsets)
+                .if(enableRefresh) { view in
+                    view.refreshable {
+                        await viewModel.trigger(.refresh)
                     }
                 }
             }

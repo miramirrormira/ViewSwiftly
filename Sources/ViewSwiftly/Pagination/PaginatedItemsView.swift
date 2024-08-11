@@ -26,20 +26,6 @@ protocol PaginatedItemsView: View {
 }
 
 extension PaginatedItemsView {
-    @ViewBuilder
-    var items: some View {
-        ForEach(viewModel.state.items) { item in
-            itemView(item)
-                .onAppear {
-                    Task(priority: .background) {
-                        await viewModel.trigger(.onAppear(item: item))
-                    }
-                }
-        }
-        if viewModel.state.status == .loading {
-            ProgressView().frame(maxWidth: .infinity)
-        }
-    }
     
     @ViewBuilder
     var content: some View {
@@ -61,6 +47,21 @@ extension PaginatedItemsView {
             }
         } else {
             listView()
+        }
+    }
+    
+    @ViewBuilder
+    var items: some View {
+        ForEach(viewModel.state.items) { item in
+            itemView(item)
+                .onAppear {
+                    Task(priority: .background) {
+                        await viewModel.trigger(.onAppear(item: item))
+                    }
+                }
+        }
+        if viewModel.state.status == .loading {
+            ProgressView().frame(maxWidth: .infinity)
         }
     }
 }
