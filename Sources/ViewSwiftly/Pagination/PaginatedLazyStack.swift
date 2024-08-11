@@ -55,12 +55,18 @@ public struct PaginatedLazyStack<T: Identifiable, ItemView: View, LoadingView: V
     
     @ViewBuilder
     func listView() -> some View {
-        if axis == .vertical {
-            ScrollView(.vertical) {
-                ZStack {
-                    ScrollViewActionsReader()
-                        .scrollDidStart(scrollDidStart)
-                        .scrollDidEnd(scrollDidEnd)
+        ScrollView(axis) {
+            ZStack {
+                ScrollViewActionsReader()
+                    .scrollDidStart(scrollDidStart)
+                    .scrollDidEnd(scrollDidEnd)
+                if axis == .horizontal {
+                    LazyHStack(alignment: verticalAlignment, spacing: 0) {
+                        items
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(edgeInsets)
+                } else {
                     LazyVStack(alignment: horizontalAlignment, spacing: 0) {
                         items
                     }
@@ -68,31 +74,11 @@ public struct PaginatedLazyStack<T: Identifiable, ItemView: View, LoadingView: V
                     .padding(edgeInsets)
                 }
             }
-            .scrollIndicators(.hidden)
-            .if(enableRefresh) { view in
-                view.refreshable {
-                    await viewModel.trigger(.refresh)
-                }
-            }
-            
-        } else if axis == .horizontal {
-            ScrollView(.horizontal) {
-                ZStack {
-                    ScrollViewActionsReader()
-                        .scrollDidStart(scrollDidStart)
-                        .scrollDidEnd(scrollDidEnd)
-                    LazyHStack(alignment: verticalAlignment, spacing: 0) {
-                        items
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(edgeInsets)
-                }
-            }
-            .scrollIndicators(.hidden)
-            .if(enableRefresh) { view in
-                view.refreshable {
-                    await viewModel.trigger(.refresh)
-                }
+        }
+        .scrollIndicators(.hidden)
+        .if(enableRefresh) { view in
+            view.refreshable {
+                await viewModel.trigger(.refresh)
             }
         }
     }
