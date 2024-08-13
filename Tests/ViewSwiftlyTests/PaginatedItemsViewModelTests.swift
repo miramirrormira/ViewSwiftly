@@ -20,7 +20,7 @@ final class PaginatedItemsViewModelTests: XCTestCase {
     
     func test_attemptLoadNextPage_with_down_scrollDirection_by_item_unidentical_to_firstItemOfLastPage_should_return_false() async throws {
         let requestable = RequestableStub(returning: [Item(id: "0"), Item(id: "1")])
-        let sut = PaginatedItemsViewModel(requestable: AnyRequestable(requestable))
+        let sut = PaginatedItemsViewModel(requestable: AnyRequestable(requestable), scrollDirection: .down)
         await sut.trigger(.requestNextPage)
         XCTAssertFalse(sut.shouldRequestNextPage(by: Item(id: "1")))
     }
@@ -34,7 +34,7 @@ final class PaginatedItemsViewModelTests: XCTestCase {
     
     func test_attemptLoadNextPage_with_down_scrollDirection_by_item_identical_to_firstItemOfLastPage_should_return_true() async throws {
         let requestable = RequestableStub(returning: [Item(id: "0"), Item(id: "1")])
-        let sut = PaginatedItemsViewModel(requestable: AnyRequestable(requestable))
+        let sut = PaginatedItemsViewModel(requestable: AnyRequestable(requestable), scrollDirection: .down)
         await sut.trigger(.requestNextPage)
         XCTAssertTrue(sut.shouldRequestNextPage(by: Item(id: "0")))
     }

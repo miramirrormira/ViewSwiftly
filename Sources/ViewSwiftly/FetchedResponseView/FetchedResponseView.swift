@@ -12,12 +12,12 @@ import NetSwiftly
 
 public struct FetchedResponseView<ResponseType, ResponseView: View, ErrorView: View>: View {
     
-    @StateObject private var vm: AnyViewModel<FetchResponseState<ResponseType>, FetchResponseActions>
+    @ObservedObject private var vm: AnyViewModel<FetchResponseState<ResponseType>, FetchResponseActions>
     @ViewBuilder var content: (ResponseType) -> ResponseView
     @ViewBuilder var errorView: (Error) -> ErrorView
     
     public var body: some View {
-        return Group {
+        Group {
             if let response = vm.state.response {
                 content(response)
             } else if let error = vm.state.status.error {
@@ -34,10 +34,10 @@ public struct FetchedResponseView<ResponseType, ResponseView: View, ErrorView: V
 
 extension FetchedResponseView {
     
-    public init(with vm: @autoclosure @escaping () -> AnyViewModel<FetchResponseState<ResponseType>, FetchResponseActions>,
+    public init(with vm: AnyViewModel<FetchResponseState<ResponseType>, FetchResponseActions>,
                 @ViewBuilder content: @escaping (ResponseType) -> ResponseView,
                 @ViewBuilder errorView: @escaping (Error) -> ErrorView = { _ in EmptyView() }) {
-        self._vm = StateObject(wrappedValue: vm())
+        self.vm = vm
         self.content = content
         self.errorView = errorView
     }
