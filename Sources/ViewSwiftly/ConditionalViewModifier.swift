@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  
+//  ConditionalViewModifier.swift
+//
 //
 //  Created by Mira Yang on 5/14/24.
 //

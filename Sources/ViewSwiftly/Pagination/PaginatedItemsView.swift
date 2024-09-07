@@ -36,9 +36,6 @@ extension PaginatedItemsView {
             ScrollView {
                 emptyListView
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .if(enableRefresh) { view in
-                        view.modifier(RefreshableModifier())
-                    }
             }
             .if(enableRefresh) { view in
                 view.refreshable {
