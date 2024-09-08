@@ -45,7 +45,8 @@ struct ScrollViewActionsReader: View {
                     }
                     detector.send(offset)
                 }
-                .onReceive(publisher) { _ in
+                .onReceive(publisher) { offset in
+                    Logger.debug("offset \(offset)")
                     scrolling = false
                     scrollDidEnd()
                 }
