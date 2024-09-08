@@ -39,6 +39,7 @@ struct ScrollViewActionsReader: View {
             Rectangle()
                 .frame(width: 0, height: 0)
                 .onChange(of: geometry.frame(in: .global).origin) { offset in
+                    Logger.debug("scrolling offset: \(offset)")
                     if !scrolling {
                         scrolling = true
                         scrollDidStart()
@@ -46,7 +47,7 @@ struct ScrollViewActionsReader: View {
                     detector.send(offset)
                 }
                 .onReceive(publisher) { offset in
-                    Logger.debug("offset \(offset)")
+                    Logger.debug("detected scroll end at offset: \(offset)")
                     scrolling = false
                     scrollDidEnd()
                 }
