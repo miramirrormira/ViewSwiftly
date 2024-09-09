@@ -16,6 +16,10 @@ struct ScrollViewActionsReader: View {
     private let publisher: AnyPublisher<CGPoint, Never>
     @State private var scrolling: Bool = false
     
+    #if DEBUG
+    var subscriptions = Set<AnyCancellable>()
+    #endif
+    
     init() {
         self.init(scrollDidStart: {}, scrollDidEnd: {})
     }
@@ -32,6 +36,12 @@ struct ScrollViewActionsReader: View {
             .dropFirst()
             .eraseToAnyPublisher()
         self.detector = detector
+        #if DEBUG
+        self.detector.sink { offset in
+            Logger.debug("detected scrolling offset: \(offset)")
+        }
+        .store(in: &subscriptions)
+        #endif
     }
     
     var body: some View {
