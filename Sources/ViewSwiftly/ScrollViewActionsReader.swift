@@ -16,10 +16,6 @@ struct ScrollViewActionsReader: View {
     private let publisher: AnyPublisher<CGPoint, Never>
     @State private var scrolling: Bool = false
     
-    #if DEBUG
-    var subscriptions = Set<AnyCancellable>()
-    #endif
-    
     init() {
         self.init(scrollDidStart: {}, scrollDidEnd: {})
     }
@@ -33,23 +29,8 @@ struct ScrollViewActionsReader: View {
         let detector = CurrentValueSubject<CGPoint, Never>(.zero)
         self.publisher = detector
             .debounce(for: .seconds(0.2), scheduler: DispatchQueue.main)
-//            .map({ offset in
-//                Logger.debug("received offset after debouncing and before dropFirst: \(offset)")
-//                return offset
-//            })
-//            .dropFirst()
-//            .map({ offset in
-//                Logger.debug("received offset after debouncing and after dropFirst: \(offset)")
-//                return offset
-//            })
             .eraseToAnyPublisher()
         self.detector = detector
-        #if DEBUG
-        self.detector.sink { offset in
-            Logger.debug("detected scrolling offset: \(offset)")
-        }
-        .store(in: &subscriptions)
-        #endif
     }
     
     var body: some View {
@@ -57,15 +38,15 @@ struct ScrollViewActionsReader: View {
             Rectangle()
                 .frame(width: 0, height: 0)
                 .onChange(of: geometry.frame(in: .global).origin) { offset in
-                    Logger.debug("scrolling offset: \(offset)")
                     if !scrolling {
                         scrolling = true
+                        Logger.debug("scroll started at offset: \(offset)")
                         scrollDidStart()
                     }
                     detector.send(offset)
                 }
                 .onReceive(publisher) { offset in
-                    Logger.debug("detected scroll end at offset: \(offset)")
+                    Logger.debug("scroll ended at offset: \(offset)")
                     scrolling = false
                     scrollDidEnd()
                 }
