@@ -9,6 +9,6 @@ import Foundation
 
 public struct PaginatedItemsState<ItemStateType> {
     public var items: [ItemStateType] = []
-    var firstPageLoaded: Bool = false
-    var status: LoadingStatus = .notRequested
+    public var firstPageLoaded: Bool = false
+    public var status: LoadingStatus = .notRequested
 }
