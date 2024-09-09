@@ -33,15 +33,15 @@ struct ScrollViewActionsReader: View {
         let detector = CurrentValueSubject<CGPoint, Never>(.zero)
         self.publisher = detector
             .debounce(for: .seconds(0.2), scheduler: DispatchQueue.main)
-            .map({ offset in
-                Logger.debug("received offset after debouncing and before dropFirst: \(offset)")
-                return offset
-            })
-            .dropFirst()
-            .map({ offset in
-                Logger.debug("received offset after debouncing and after dropFirst: \(offset)")
-                return offset
-            })
+//            .map({ offset in
+//                Logger.debug("received offset after debouncing and before dropFirst: \(offset)")
+//                return offset
+//            })
+//            .dropFirst()
+//            .map({ offset in
+//                Logger.debug("received offset after debouncing and after dropFirst: \(offset)")
+//                return offset
+//            })
             .eraseToAnyPublisher()
         self.detector = detector
         #if DEBUG
