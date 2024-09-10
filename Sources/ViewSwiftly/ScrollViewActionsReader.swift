@@ -29,7 +29,7 @@ struct ScrollViewActionsReader: View {
         let detector = CurrentValueSubject<CGPoint, Never>(.zero)
         self.publisher = detector
             .debounce(for: .seconds(0.2), scheduler: DispatchQueue.main)
-//            .dropFirst()
+            .dropFirst()
             .eraseToAnyPublisher()
         self.detector = detector
     }
