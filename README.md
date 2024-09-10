@@ -19,3 +19,7 @@ dependencies: [
 
 ## Example
 [ViewSwiftlyExample](https://github.com/miramirrormira/ViewSwiftExample)
+
+
+## TODO:
+- decide whether to use dropFirst in the publisher of ScrollViewActionsReader
