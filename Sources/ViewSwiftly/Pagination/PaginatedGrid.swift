@@ -57,8 +57,16 @@ public struct PaginatedGrid<T: Identifiable, ItemView: View, LoadingView: View, 
                 ScrollViewActionsReader()
                     .scrollDidStart(scrollDidStart)
                     .scrollDidEnd(scrollDidEnd)
-                LazyVGrid(columns: layout, spacing: 0) {
-                    items
+                Group {
+                    if axis == .horizontal {
+                        LazyHGrid(rows: layout, spacing: 0) {
+                            items
+                        }
+                    } else {
+                        LazyVGrid(columns: layout, spacing: 0) {
+                            items
+                        }
+                    }
                 }
                 .padding(edgeInsets)
                 .if(enableRefresh) { view in
