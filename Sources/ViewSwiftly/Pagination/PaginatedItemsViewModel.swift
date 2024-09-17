@@ -65,6 +65,11 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable, ItemSta
             state.status = .loading
             do {
                 let items = try await requestable.request()
+                
+                #if DEBUG
+                Logger.info("\(label) loaded new items: \(items)")
+                #endif
+                
                 state.firstPageLoaded = true
                 state.status = .success
                 
@@ -74,6 +79,9 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable, ItemSta
                 try await fetchItemsStrategy?.onFetchItems(items)
             } catch {
                 state.status = .failure(error)
+                #if DEBUG
+                Logger.error("\(error.localizedDescription)")
+                #endif
             }
         case .refresh:
             refreshStrategy?.refresh(vm: self)
@@ -95,9 +103,11 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable, ItemSta
         }
     }
     
+    #if DEBUG
     deinit {
         Logger.debug("\(ItemType.Type.self), \(label)")
     }
+    #endif
 }
 
 public extension PaginatedItemsViewModel {
