@@ -108,7 +108,7 @@ final class PaginatedItemsViewModelTests: XCTestCase {
         let networkConfiguration = NetworkConfiguration.fixture()
         let endpoint = Endpoint.fixture()
         let paginationQueryStrategy = PageBasedQueryStrategy.fixture()
-        let anyMergeItemsStrategy = AnyMergeItemsStrategy<Item, Item>(AppendItems())
+        let anyMergeItemsStrategy = AnyMergeItemsStrategy<Item>(AppendItems())
         let transform: (Page) -> [Item] = { $0.items }
         let sut = PaginatedItemsViewModel(networkConfiguration: networkConfiguration, endpoint: endpoint, paginationQueryStrategy: paginationQueryStrategy, mergeItemsStrategy: anyMergeItemsStrategy, transform: transform)
         
