@@ -25,6 +25,8 @@ public struct PaginatedLazyStack<Item: Identifiable, ItemView: View, LoadingView
     let scrollDidStart: () -> Void
     let scrollDidEnd: () -> Void
     
+    var startLoadingOnAppear: Bool
+    
     public init(viewModel: AnyViewModel<PaginatedItemsState<Item>, PaginatedItemsActions<Item>>,
                 itemView: @escaping (Item) -> ItemView,
                 @ViewBuilder loadingView: () -> LoadingView = { EmptyView() },
@@ -35,7 +37,8 @@ public struct PaginatedLazyStack<Item: Identifiable, ItemView: View, LoadingView
                 verticalAlignment: VerticalAlignment = .center,
                 horizontalAlignment: HorizontalAlignment = .center,
                 scrollDidStart: @escaping () -> Void = { },
-                scrollDidEnd: @escaping () -> Void = { }) {
+                scrollDidEnd: @escaping () -> Void = { },
+                startLoadingOnAppear: Bool = true) {
         self.viewModel = viewModel
         self.itemView = itemView
         self.loadingView = loadingView()
@@ -47,6 +50,7 @@ public struct PaginatedLazyStack<Item: Identifiable, ItemView: View, LoadingView
         self.horizontalAlignment = horizontalAlignment
         self.scrollDidStart = scrollDidStart
         self.scrollDidEnd = scrollDidEnd
+        self.startLoadingOnAppear = startLoadingOnAppear
     }
     
     public var body: some View {

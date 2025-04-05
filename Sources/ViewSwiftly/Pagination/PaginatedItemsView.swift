@@ -23,27 +23,37 @@ protocol PaginatedItemsView: View {
     
     var viewModel: AnyViewModel<PaginatedItemsState<ItemType>, PaginatedItemsActions<ItemType>> { get }
     var enableRefresh: Bool { get }
+    var startLoadingOnAppear: Bool { get }
 }
 
 extension PaginatedItemsView {
     
     @ViewBuilder
     var content: some View {
-        if viewModel.state.firstPageLoaded == false {
-            loadingView
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else if viewModel.state.items.isEmpty {
-            ScrollView {
-                emptyListView
+        Group {
+            if viewModel.state.firstPageLoaded == false {
+                loadingView
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if viewModel.state.items.isEmpty {
+                ScrollView {
+                    emptyListView
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+                .if(enableRefresh) { view in
+                    view.refreshable {
+                        await viewModel.trigger(.refresh)
+                    }
+                }
+            } else {
+                listView()
             }
-            .if(enableRefresh) { view in
-                view.refreshable {
-                    await viewModel.trigger(.refresh)
+        }
+        .onAppear{
+            if startLoadingOnAppear {
+                Task {
+                    await viewModel.trigger(.requestNextPage)
                 }
             }
-        } else {
-            listView()
         }
     }
     

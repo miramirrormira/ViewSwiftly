@@ -19,18 +19,22 @@ public struct PaginatedList<Item: Identifiable, ItemView: View, LoadingView: Vie
     let edgeInsets: EdgeInsets
     let enableRefresh: Bool
     
+    var startLoadingOnAppear: Bool
+    
     public init(viewModel: AnyViewModel<PaginatedItemsState<Item>, PaginatedItemsActions<Item>>,
                 itemView: @escaping (Item) -> ItemView,
                 @ViewBuilder loadingView: () -> LoadingView = { EmptyView() },
                 @ViewBuilder emptyListView: () -> EmptyListView = { EmptyView() },
                 edgeInsets: EdgeInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0),
-                enableRefresh: Bool = true) {
+                enableRefresh: Bool = true,
+                startLoadingOnAppear: Bool = true) {
         self.viewModel = viewModel
         self.itemView = itemView
         self.loadingView = loadingView()
         self.emptyListView = emptyListView()
         self.edgeInsets = edgeInsets
         self.enableRefresh = enableRefresh
+        self.startLoadingOnAppear = startLoadingOnAppear
     }
     
     public var body: some View {

@@ -26,6 +26,8 @@ public struct PaginatedGrid<Item: Identifiable, ItemView: View, LoadingView: Vie
     let scrollDidStart: () -> Void
     let scrollDidEnd: () -> Void
     
+    var startLoadingOnAppear: Bool
+    
     public init(viewModel: AnyViewModel<PaginatedItemsState<Item>, PaginatedItemsActions<Item>>,
                 itemView: @escaping (Item) -> ItemView,
                 @ViewBuilder loadingView: () -> LoadingView = { EmptyView() },
@@ -35,7 +37,8 @@ public struct PaginatedGrid<Item: Identifiable, ItemView: View, LoadingView: Vie
                 enableRefresh: Bool = true,
                 axis: Axis.Set = .vertical,
                 scrollDidStart: @escaping () -> Void = { },
-                scrollDidEnd: @escaping () -> Void = { }) {
+                scrollDidEnd: @escaping () -> Void = { },
+                startLoadingOnAppear: Bool = true) {
         self.viewModel = viewModel
         self.itemView = itemView
         self.loadingView = loadingView()
@@ -46,6 +49,7 @@ public struct PaginatedGrid<Item: Identifiable, ItemView: View, LoadingView: Vie
         self.layout = layout
         self.scrollDidStart = scrollDidStart
         self.scrollDidEnd = scrollDidEnd
+        self.startLoadingOnAppear = startLoadingOnAppear
     }
     
     public var body: some View {
