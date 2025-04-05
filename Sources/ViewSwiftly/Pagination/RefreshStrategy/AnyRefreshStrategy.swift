@@ -7,18 +7,17 @@
 
 import Foundation
 
-public class AnyRefreshStrategy<T: Decodable & Identifiable, S: Identifiable>: RefreshStrategy {
+public class AnyRefreshStrategy<Item: Decodable & Identifiable>: RefreshStrategy {
     
-    public typealias ItemStateType = S
-    public typealias ItemType = T
+    public typealias ItemType = Item
     
-    let wrappedRefresh: (PaginatedItemsViewModel<T, S>) -> Void
+    let wrappedRefresh: (PaginatedItemsViewModel<Item>) -> Void
     
-    public init<V: RefreshStrategy>(_ strategy: V) where V.ItemType == T, V.ItemStateType == S {
+    public init<V: RefreshStrategy>(_ strategy: V) where V.ItemType == Item {
         wrappedRefresh = strategy.refresh(vm:)
     }
     
-    public func refresh(vm: PaginatedItemsViewModel<T, S>) {
+    public func refresh(vm: PaginatedItemsViewModel<Item>) {
         wrappedRefresh(vm)
     }
     

@@ -9,11 +9,9 @@ import Foundation
 import Combine
 import NetSwiftly
 
-class FallbackPublisherDecorator<T>: ResponsePublisherDecorator<T> {
+class FallbackPublisherDecorator<Response>: ResponsePublisherDecorator<Response> {
     
-    typealias Response = T
-    
-    let fallbackPublisher: AnyResponsePublisher<T>
+    let fallbackPublisher: AnyResponsePublisher<Response>
     var networkingRequestResponded: Bool = false
     
     enum DataSource {
@@ -21,18 +19,18 @@ class FallbackPublisherDecorator<T>: ResponsePublisherDecorator<T> {
         case response
     }
     
-    init(fallbackPublisher: AnyResponsePublisher<T>, responsePublisher: AnyResponsePublisher<T>) {
+    init(fallbackPublisher: AnyResponsePublisher<Response>, responsePublisher: AnyResponsePublisher<Response>) {
         self.fallbackPublisher = fallbackPublisher
         super.init(responsePublisher: responsePublisher)
     }
     
-    convenience init(fallbackRequestable: AnyRequestable<T>, responseRequestable: AnyRequestable<T>) {
+    convenience init(fallbackRequestable: AnyRequestable<Response>, responseRequestable: AnyRequestable<Response>) {
         let fallbackPublisher = AnyResponsePublisher(RequestResponseSubject(requestable: fallbackRequestable))
         let responsePublisher = AnyResponsePublisher(RequestResponseSubject(requestable: responseRequestable))
         self.init(fallbackPublisher: fallbackPublisher, responsePublisher: responsePublisher)
     }
     
-    override func publisher() async throws -> AnyPublisher<T, Error> {
+    override func publisher() async throws -> AnyPublisher<Response, Error> {
         let responsePub = try await super.publisher().map { response in
             return (response, DataSource.response)
         }

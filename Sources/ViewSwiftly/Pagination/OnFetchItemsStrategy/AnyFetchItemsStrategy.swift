@@ -7,17 +7,17 @@
 
 import Foundation
 
-public class AnyFetchItemsStrategy<ItemType>: FetchItemsStrategy {
+public class AnyFetchItemsStrategy<Item>: FetchItemsStrategy {
     
-    public typealias Item = ItemType
+    public typealias ItemType = Item
     
     let wrappedOnFetchItems: ([Item]) async throws -> Void
     
-    public init<V: FetchItemsStrategy>(_ strategy: V) where V.Item == ItemType {
+    public init<V: FetchItemsStrategy>(_ strategy: V) where V.ItemType == ItemType {
         self.wrappedOnFetchItems = strategy.onFetchItems(_:)
     }
     
-    public func onFetchItems(_ items: [ItemType]) async throws {
+    public func onFetchItems(_ items: [Item]) async throws {
         try await wrappedOnFetchItems(items)
     }
 }

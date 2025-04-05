@@ -9,56 +9,38 @@ import Foundation
 import NetSwiftly
 import Combine
 
-public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable, ItemStateType: Identifiable>: ViewModel {
+public class PaginatedItemsViewModel<Item: Identifiable & Decodable>: ViewModel {
     
-    @MainActor @Published public var state = PaginatedItemsState<ItemStateType>()
-    public var requestable: AnyRequestable<[ItemType]>
-    public var firstItemOfLastPage: ItemStateType.ID?
-    public var lastItemOfLastPage: ItemStateType.ID?
-    public var mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType>
-    public var refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>?
-    public var fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>?
+    @MainActor @Published public var state = PaginatedItemsState<Item>()
+    public var requestable: AnyRequestable<[Item]>
+    public var firstItemOfLastPage: Item.ID?
+    public var lastItemOfLastPage: Item.ID?
+    public var mergeItemsStrategy: AnyMergeItemsStrategy<Item>
+    public var refreshStrategy: AnyRefreshStrategy<Item>?
+    public var fetchItemsStrategy: AnyFetchItemsStrategy<Item>?
     public var scrollDirection: ScrollDirection
-    public let toItemState: (ItemType) async throws -> ItemStateType
     let label: String
     
     public enum ScrollDirection {
         case up, down
     }
     
-    public init(requestable: AnyRequestable<[ItemType]>,
-                mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType> = AnyMergeItemsStrategy<ItemType, ItemStateType>(AppendItems()),
-                refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>? = nil,
-                fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
+    public init(requestable: AnyRequestable<[Item]>,
+                mergeItemsStrategy: AnyMergeItemsStrategy<Item> = AnyMergeItemsStrategy<Item>(AppendItems()),
+                refreshStrategy: AnyRefreshStrategy<Item>? = nil,
+                fetchItemsStrategy: AnyFetchItemsStrategy<Item>? = nil,
                 scrollDirection: ScrollDirection = .down,
-                label: String = "",
-                toItemState: @escaping (ItemType) async throws -> ItemStateType) {
+                label: String = "") {
         self.requestable = requestable
         self.mergeItemsStrategy = mergeItemsStrategy
         self.refreshStrategy = refreshStrategy
         self.fetchItemsStrategy = fetchItemsStrategy
         self.scrollDirection = scrollDirection
         self.label = label
-        self.toItemState = toItemState
-    }
-    
-    public init(requestable: AnyRequestable<[ItemType]>,
-                mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType> = AnyMergeItemsStrategy<ItemType, ItemStateType>(AppendItems()),
-                refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>? = nil,
-                fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
-                scrollDirection: ScrollDirection = .up,
-                label: String = "") where ItemType == ItemStateType, ItemStateType: Identifiable {
-        self.requestable = requestable
-        self.mergeItemsStrategy = mergeItemsStrategy
-        self.refreshStrategy = refreshStrategy
-        self.fetchItemsStrategy = fetchItemsStrategy
-        self.scrollDirection = scrollDirection
-        self.label = label
-        self.toItemState = { $0 }
     }
     
     @MainActor
-    public func trigger(_ action: PaginatedItemsActions<ItemStateType>) async {
+    public func trigger(_ action: PaginatedItemsActions<Item>) async {
         switch action {
         case .requestNextPage:
             guard state.status != .loading else { return }
@@ -94,7 +76,7 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable, ItemSta
         }
     }
     
-    func shouldRequestNextPage(by item: ItemStateType) -> Bool {
+    func shouldRequestNextPage(by item: Item) -> Bool {
         switch scrollDirection {
         case .up:
             lastItemOfLastPage == nil || item.id == lastItemOfLastPage!
@@ -105,46 +87,27 @@ public class PaginatedItemsViewModel<ItemType: Identifiable & Decodable, ItemSta
     
     #if DEBUG
     deinit {
-        Logger.debug("\(ItemType.Type.self), \(label)")
+        Logger.debug("\(Item.Type.self), \(label)")
     }
     #endif
 }
 
 public extension PaginatedItemsViewModel {
-    convenience init<PageType: Decodable>(networkConfiguration: NetworkConfiguration,
+    convenience init<Page: Decodable>(networkConfiguration: NetworkConfiguration,
                                           endpoint: Endpoint,
                                           paginationQueryStrategy: PaginationQueryStrategy,
-                                          mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType> = AnyMergeItemsStrategy<ItemType, ItemStateType>(AppendItems()),
-                                          refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>? = nil,
-                                          fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
-                                          transform: @escaping (PageType) -> [ItemType],
-                                          label: String = "",
-                                          toItemState: @escaping (ItemType) async throws -> ItemStateType) {
+                                          mergeItemsStrategy: AnyMergeItemsStrategy<Item> = AnyMergeItemsStrategy<Item>(AppendItems()),
+                                          refreshStrategy: AnyRefreshStrategy<Item>? = nil,
+                                          fetchItemsStrategy: AnyFetchItemsStrategy<Item>? = nil,
+                                          transform: @escaping (Page) -> [Item],
+                                          label: String = "") {
         
-        let requestable = PaginatedURLRequestCommand<PageType, ItemType>(networkConfiguration: networkConfiguration,
+        let requestable = PaginatedURLRequestCommand<Page, Item>(networkConfiguration: networkConfiguration,
                                                                          endpoint: endpoint,
                                                                          paginationQueryStrategy: paginationQueryStrategy,
                                                                          transform: transform)
         
-        let anyRequestable = AnyRequestable<[ItemType]>(requestable)
-        self.init(requestable: anyRequestable, mergeItemsStrategy: mergeItemsStrategy, refreshStrategy: refreshStrategy, fetchItemsStrategy: fetchItemsStrategy, label: label, toItemState: toItemState)
-    }
-    
-    convenience init<PageType: Decodable>(networkConfiguration: NetworkConfiguration,
-                                          endpoint: Endpoint,
-                                          paginationQueryStrategy: PaginationQueryStrategy,
-                                          mergeItemsStrategy: AnyMergeItemsStrategy<ItemType, ItemStateType> = AnyMergeItemsStrategy<ItemType, ItemStateType>(AppendItems()),
-                                          refreshStrategy: AnyRefreshStrategy<ItemType, ItemStateType>? = nil,
-                                          fetchItemsStrategy: AnyFetchItemsStrategy<ItemType>? = nil,
-                                          transform: @escaping (PageType) -> [ItemType],
-                                          label: String = "") where ItemType == ItemStateType {
-        
-        let requestable = PaginatedURLRequestCommand<PageType, ItemType>(networkConfiguration: networkConfiguration,
-                                                                         endpoint: endpoint,
-                                                                         paginationQueryStrategy: paginationQueryStrategy,
-                                                                         transform: transform)
-        
-        let anyRequestable = AnyRequestable<[ItemType]>(requestable)
+        let anyRequestable = AnyRequestable<[Item]>(requestable)
         self.init(requestable: anyRequestable, mergeItemsStrategy: mergeItemsStrategy, refreshStrategy: refreshStrategy, fetchItemsStrategy: fetchItemsStrategy, label: label)
     }
 }

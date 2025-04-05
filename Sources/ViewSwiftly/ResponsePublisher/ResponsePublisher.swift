@@ -9,6 +9,6 @@ import Foundation
 import Combine
 
 public protocol ResponsePublisher {
-    associatedtype Response
-    func publisher() async throws -> AnyPublisher<Response, Error>
+    associatedtype ResponseType
+    func publisher() async throws -> AnyPublisher<ResponseType, Error>
 }

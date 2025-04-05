@@ -8,16 +8,16 @@
 import Foundation
 import Combine
 
-public class ResponsePublisherDecorator<V>: ResponsePublisher {
-    public typealias Response = V
+public class ResponsePublisherDecorator<Response>: ResponsePublisher {
+    public typealias ResponseType = Response
     
-    let responsePublisher: AnyResponsePublisher<V>
+    let responsePublisher: AnyResponsePublisher<Response>
     
-    init(responsePublisher: AnyResponsePublisher<V>) {
+    init(responsePublisher: AnyResponsePublisher<Response>) {
         self.responsePublisher = responsePublisher
     }
     
-    public func publisher() async throws -> AnyPublisher<V, Error> {
+    public func publisher() async throws -> AnyPublisher<Response, Error> {
         try await responsePublisher.publisher()
     }
 }

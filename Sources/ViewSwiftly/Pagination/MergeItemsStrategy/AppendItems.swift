@@ -8,11 +8,11 @@
 import Foundation
 
 
-public class AppendItems<Item: Decodable & Identifiable, ItemState: Identifiable>: MergeItemsStrategy {
+public class AppendItems<Item: Decodable & Identifiable>: MergeItemsStrategy {
+    public typealias ItemType = Item
     public init() { }
     @MainActor
-    public func merge(vm: PaginatedItemsViewModel<Item, ItemState>, with newItems: [Item]) async throws {
-        let itemStates = try await newItems.concurrentMap(vm.toItemState)
-        vm.state.items.append(contentsOf: itemStates)
+    public func merge(vm: PaginatedItemsViewModel<Item>, with newItems: [Item]) async throws {
+        vm.state.items.append(contentsOf: newItems)
     }
 }

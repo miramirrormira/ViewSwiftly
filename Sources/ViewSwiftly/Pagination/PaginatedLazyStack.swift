@@ -8,11 +8,11 @@
 import Foundation
 import SwiftUI
 
-public struct PaginatedLazyStack<T: Identifiable, ItemView: View, LoadingView: View, EmptyListView: View>: PaginatedItemsView {
+public struct PaginatedLazyStack<Item: Identifiable, ItemView: View, LoadingView: View, EmptyListView: View>: PaginatedItemsView {
     
-    @ObservedObject var viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>
+    @ObservedObject var viewModel: AnyViewModel<PaginatedItemsState<Item>, PaginatedItemsActions<Item>>
     
-    @ViewBuilder var itemView: (T) -> ItemView
+    @ViewBuilder var itemView: (Item) -> ItemView
     var loadingView: LoadingView
     var emptyListView: EmptyListView
     
@@ -25,8 +25,8 @@ public struct PaginatedLazyStack<T: Identifiable, ItemView: View, LoadingView: V
     let scrollDidStart: () -> Void
     let scrollDidEnd: () -> Void
     
-    public init(viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>,
-                itemView: @escaping (T) -> ItemView,
+    public init(viewModel: AnyViewModel<PaginatedItemsState<Item>, PaginatedItemsActions<Item>>,
+                itemView: @escaping (Item) -> ItemView,
                 @ViewBuilder loadingView: () -> LoadingView = { EmptyView() },
                 @ViewBuilder emptyListView: () -> EmptyListView = { EmptyView() },
                 edgeInsets: EdgeInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0),

@@ -8,6 +8,6 @@
 import Foundation
 
 public protocol FetchItemsStrategy {
-    associatedtype Item
-    func onFetchItems(_ items: [Item]) async throws
+    associatedtype ItemType
+    func onFetchItems(_ items: [ItemType]) async throws
 }

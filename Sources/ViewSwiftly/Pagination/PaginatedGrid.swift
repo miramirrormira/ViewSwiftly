@@ -8,11 +8,13 @@
 import Foundation
 import SwiftUI
 
-public struct PaginatedGrid<T: Identifiable, ItemView: View, LoadingView: View, EmptyListView: View>: PaginatedItemsView {
+public struct PaginatedGrid<Item: Identifiable, ItemView: View, LoadingView: View, EmptyListView: View>: PaginatedItemsView {
     
-    @ObservedObject var viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>
+    public typealias ItemType = Item
     
-    @ViewBuilder var itemView: (T) -> ItemView
+    @ObservedObject var viewModel: AnyViewModel<PaginatedItemsState<Item>, PaginatedItemsActions<Item>>
+    
+    @ViewBuilder var itemView: (Item) -> ItemView
     var loadingView: LoadingView
     var emptyListView: EmptyListView
     
@@ -24,8 +26,8 @@ public struct PaginatedGrid<T: Identifiable, ItemView: View, LoadingView: View, 
     let scrollDidStart: () -> Void
     let scrollDidEnd: () -> Void
     
-    public init(viewModel: AnyViewModel<PaginatedItemsState<T>, PaginatedItemsActions<T>>,
-                itemView: @escaping (T) -> ItemView,
+    public init(viewModel: AnyViewModel<PaginatedItemsState<Item>, PaginatedItemsActions<Item>>,
+                itemView: @escaping (Item) -> ItemView,
                 @ViewBuilder loadingView: () -> LoadingView = { EmptyView() },
                 @ViewBuilder emptyListView: () -> EmptyListView = { EmptyView() },
                 layout: [GridItem],

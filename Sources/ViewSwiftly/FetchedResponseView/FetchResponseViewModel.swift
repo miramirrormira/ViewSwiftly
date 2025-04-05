@@ -9,20 +9,20 @@ import Foundation
 import Combine
 import NetSwiftly
 
-public class FetchResponseViewModel<ResponseType>: ViewModel {
+public class FetchResponseViewModel<Response>: ViewModel {
     
-    @MainActor @Published public var state: FetchResponseState<ResponseType> = .init()
+    @MainActor @Published public var state: FetchResponseState<Response> = .init()
     let label: String
     
-    public let responsePublisher: AnyResponsePublisher<ResponseType>
+    public let responsePublisher: AnyResponsePublisher<Response>
     var cancellables: Set<AnyCancellable> = []
     
-    public init(responsePublisher: AnyResponsePublisher<ResponseType>, label: String = "") {
+    public init(responsePublisher: AnyResponsePublisher<Response>, label: String = "") {
         self.responsePublisher = responsePublisher
         self.label = label
     }
     
-    public init(requestable: AnyRequestable<ResponseType>, label: String = "") {
+    public init(requestable: AnyRequestable<Response>, label: String = "") {
         self.responsePublisher = AnyResponsePublisher(RequestResponseSubject(requestable: requestable))
         self.label = label
     }
@@ -59,12 +59,12 @@ public class FetchResponseViewModel<ResponseType>: ViewModel {
     }
     
     deinit {
-        Logger.info("\(ResponseType.Type.self), \(label)")
+        Logger.info("\(Response.Type.self), \(label)")
     }
 }
 
-public struct FetchResponseState<ResponseType> {
-    public var response: ResponseType?
+public struct FetchResponseState<Response> {
+    public var response: Response?
     public var status: LoadingStatus = .notRequested
 }
 

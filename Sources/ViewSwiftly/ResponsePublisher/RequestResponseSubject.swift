@@ -9,13 +9,13 @@ import Foundation
 import NetSwiftly
 import Combine
 
-public class RequestResponseSubject<V>: ResponsePublisher {
+public class RequestResponseSubject<Response>: ResponsePublisher {
     
-    public typealias Response = V
+    public typealias ResponseType = Response
     
-    let requestable: AnyRequestable<V>
+    let requestable: AnyRequestable<Response>
     
-    public init(requestable: AnyRequestable<V>) {
+    public init(requestable: AnyRequestable<Response>) {
         self.requestable = requestable
     }
     

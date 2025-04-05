@@ -7,8 +7,8 @@
 
 import Foundation
 
-public struct PaginatedItemsState<ItemStateType> {
-    public var items: [ItemStateType] = []
+public struct PaginatedItemsState<Item> {
+    public var items: [Item] = []
     public var firstPageLoaded: Bool = false
     public var status: LoadingStatus = .notRequested
 }
